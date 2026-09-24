@@ -1,1123 +1,1162 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Windows App Purge Tool | Commercial License & Enterprise Store</title>
-    
-    <!-- External CDNs: FontAwesome Icons & JetBrains Mono Code Font -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
+    <title>Smart Windows Tools | Ultimate Windows App Purge Tool Enterprise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        msblue: '#0078D4',
+                        msbluehover: '#005A9E',
+                        msbluedark: '#004578',
+                        mslightgray: '#F3F3F3',
+                        msborder: '#E5E5E5',
+                        msdarkborder: '#D1D1D1',
+                        mstext: '#1A1A1A',
+                        mssubtext: '#505050'
+                    },
+                    fontFamily: {
+                        sans: ['"Segoe UI"', '-apple-system', 'BlinkMacSystemFont', 'Roboto', 'sans-serif'],
+                        mono: ['Consolas', '"Courier New"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* ==========================================================================
-           MICROSOFT FLUENT DESIGN SYSTEM & COMMERCIAL STORE TOKENS
-           ========================================================================== */
-        :root {
-            --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', Consolas, Monaco, monospace;
-            
-            /* Fluent Dark Theme Defaults */
-            --bg-base: #202020;
-            --bg-card: #2c2c2c;
-            --bg-card-hover: #323232;
-            --bg-input: #1f1f1f;
-            --bg-console: #121212;
-            --bg-hero: linear-gradient(135deg, #1f1f1f 0%, #152338 100%);
-            
-            --border-color: #3e3e3e;
-            --border-hover: #505050;
-            
-            --text-primary: #ffffff;
-            --text-secondary: #adadad;
-            --text-muted: #767676;
-            
-            --accent-blue: #0078d4;
-            --accent-blue-hover: #106ebe;
-            --accent-green: #107c41;
-            --accent-green-hover: #0f6d39;
-            --accent-red: #c42b1c;
-            --accent-gold: #ffb900;
-            
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            
-            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.35);
-            --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.7);
-            --backdrop-blur: blur(20px);
-        }
-
-        [data-theme="light"] {
-            --bg-base: #f3f3f3;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f9f9f9;
-            --bg-input: #ffffff;
-            --bg-console: #1e1e1e;
-            --bg-hero: linear-gradient(135deg, #ffffff 0%, #e6f2ff 100%);
-            
-            --border-color: #e5e5e5;
-            --border-hover: #d1d1d1;
-            
-            --text-primary: #1a1a1a;
-            --text-secondary: #5d5d5d;
-            --text-muted: #8a8a8a;
-            
-            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
-            --shadow-modal: 0 16px 36px rgba(0, 0, 0, 0.2);
-        }
-
         * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            border-radius: 0px !important;
+            box-shadow: none !important;
         }
-
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-base);
-            color: var(--text-primary);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* ==========================================================================
-           MICROSOFT STORE HEADER & TOP NAV
-           ========================================================================== */
-        header {
-            background-color: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: var(--backdrop-blur);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .brand-icon {
-            font-size: 26px;
-            color: var(--accent-blue);
-        }
-
-        .brand-text h1 {
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: -0.2px;
-        }
-
-        .brand-text p {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* ==========================================================================
-           BUTTONS & CONTROLS (FLUENT DESIGN)
-           ========================================================================== */
-        .btn {
-            font-family: var(--font-family);
-            font-size: 13px;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-card);
-            color: var(--text-primary);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            user-select: none;
-        }
-
-        .btn:hover {
-            background-color: var(--bg-card-hover);
-            border-color: var(--border-hover);
-        }
-
-        .btn-primary {
-            background-color: var(--accent-blue);
-            border-color: var(--accent-blue);
-            color: #ffffff;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--accent-blue-hover);
-            border-color: var(--accent-blue-hover);
-        }
-
-        .btn-success {
-            background-color: var(--accent-green);
-            border-color: var(--accent-green);
-            color: #ffffff;
-            font-size: 14px;
-            padding: 10px 22px;
-        }
-
-        .btn-success:hover {
-            background-color: var(--accent-green-hover);
-            border-color: var(--accent-green-hover);
-        }
-
-        .btn-icon {
-            padding: 8px 12px;
-        }
-
-        /* ==========================================================================
-           COMMERCIAL STORE HERO BANNER
-           ========================================================================== */
-        .hero {
-            background: var(--bg-hero);
-            border-bottom: 1px solid var(--border-color);
-            padding: 40px 32px;
-            box-shadow: var(--shadow-card);
-        }
-
-        .hero-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 36px;
-            align-items: center;
-        }
-
-        @media (max-width: 992px) {
-            .hero-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background-color: rgba(0, 120, 212, 0.15);
-            color: var(--accent-blue);
-            border: 1px solid rgba(0, 120, 212, 0.3);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .hero-title {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-        }
-
-        .hero-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            max-width: 720px;
-        }
-
-        .hero-features-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .hero-feature-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-        }
-
-        .hero-feature-item i {
-            color: var(--accent-green);
-        }
-
-        .purchase-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 24px;
-            box-shadow: var(--shadow-modal);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .price-tag {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-
-        .price-amount {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .price-period {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .guarantee-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            border-top: 1px solid var(--border-color);
-            padding-top: 12px;
-        }
-
-        /* ==========================================================================
-           MAIN CONTENT & INTERACTIVE DEMO
-           ========================================================================== */
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 32px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 28px;
-            flex: 1;
-        }
-
-        @media (max-width: 992px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 24px;
-            box-shadow: var(--shadow-card);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* App Selection List */
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .search-box {
-            position: relative;
-            flex: 1;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 8px 12px 8px 36px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-primary);
-            font-size: 13px;
-            outline: none;
-        }
-
-        .search-input:focus {
-            border-color: var(--accent-blue);
-        }
-
-        .app-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 10px;
-            max-height: 480px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .app-item {
-            background-color: var(--bg-base);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 10px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .app-item:hover {
-            border-color: var(--border-hover);
-            background-color: var(--bg-card-hover);
-        }
-
-        .app-item.selected {
-            border-color: var(--accent-blue);
-            background-color: rgba(0, 120, 212, 0.08);
-        }
-
-        .app-info {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .app-name {
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .app-pkg {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .checkbox-custom {
-            width: 18px;
-            height: 18px;
-            border: 1px solid var(--text-secondary);
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: transparent;
-            flex-shrink: 0;
-            margin-left: 10px;
-        }
-
-        .app-item.selected .checkbox-custom {
-            background-color: var(--accent-blue);
-            border-color: var(--accent-blue);
-            color: #ffffff;
-        }
-
-        /* Sidebar Source Code & Info */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .license-banner {
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.12) 0%, rgba(16, 124, 65, 0.12) 100%);
-            border: 1px solid var(--accent-blue);
-            border-radius: var(--radius-md);
-            padding: 18px;
-        }
-
-        .license-banner h3 {
-            font-size: 14px;
-            color: var(--accent-blue);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .license-banner p {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
-
-        /* ==========================================================================
-           MODALS & CHECKOUT FULFILLMENT
-           ========================================================================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 580px;
-            box-shadow: var(--shadow-modal);
-            padding: 28px;
-            transform: scale(0.95);
-            transition: transform 0.2s ease;
-        }
-
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-primary);
-            font-size: 13px;
-        }
-
-        .progress-bar-bg {
-            height: 6px;
-            background-color: var(--bg-input);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 12px 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background-color: var(--accent-blue);
-            transition: width 0.3s ease;
-        }
-
-        .console-box {
-            background-color: var(--bg-console);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            height: 180px;
-            padding: 12px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: #00ff66;
-            overflow-y: auto;
-            margin: 12px 0;
-        }
-
-        /* Commercial Copyright Footer */
-        footer {
-            background-color: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-            padding: 24px 32px;
-            margin-top: 40px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent-blue);
-            text-decoration: underline;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background-color: var(--accent-green);
-            color: #ffffff;
-            padding: 12px 20px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: var(--shadow-modal);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 2000;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+            background-color: #FFFFFF !important;
+            color: #1A1A1A !important;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .ms-focus:focus {
+            outline: 2px solid #0078D4 !important;
+            outline-offset: 1px;
+        }
+        .ms-grid-bg {
+            background-size: 24px 24px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+        }
+        .ms-table th, .ms-table td {
+            border: 1px solid #E5E5E5;
+        }
+        /* Custom scrollbar for CLI terminal logs */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F3F3F3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0078D4;
         }
     </style>
 </head>
-<body>
+<body class="bg-white text-mstext selection:bg-msblue selection:text-white flex flex-col min-h-screen">
 
-    <!-- Header Navigation Bar -->
-    <header>
-        <div class="brand">
-            <i class="fa-brands fa-windows brand-icon"></i>
-            <div class="brand-text">
-                <h1>Ultimate Windows App Purge Tool</h1>
-                <p>Commercial Edition &bull; Smart Windows Tools</p>
+    <header class="sticky top-0 z-40 bg-white border-b border-msborder">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo with 6 Blue Squares -->
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="grid grid-cols-3 gap-0.5 w-7 h-5 flex-shrink-0">
+                    <div class="bg-msblue w-full h-full"></div>
+                    <div class="bg-msblue w-full h-full"></div>
+                    <div class="bg-msblue w-full h-full"></div>
+                    <div class="bg-msblue w-full h-full"></div>
+                    <div class="bg-msblue w-full h-full"></div>
+                    <div class="bg-msblue w-full h-full"></div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-semibold text-base leading-tight tracking-tight text-mstext">Smart Windows Tools</span>
+                    <span class="text-xs text-mssubtext font-normal">Ultimate App Purge v4.8</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-normal">
+                <a href="#overview" class="text-mstext hover:text-msblue border-b-2 border-transparent hover:border-msblue py-5 transition-colors">Overview</a>
+                <a href="#features" class="text-mstext hover:text-msblue border-b-2 border-transparent hover:border-msblue py-5 transition-colors">Features</a>
+                <a href="#architecture" class="text-mstext hover:text-msblue border-b-2 border-transparent hover:border-msblue py-5 transition-colors">Architecture</a>
+                <a href="#calculator" class="text-mstext hover:text-msblue border-b-2 border-transparent hover:border-msblue py-5 transition-colors">ROI Calculator</a>
+                <a href="#pricing" class="text-mstext hover:text-msblue border-b-2 border-transparent hover:border-msblue py-5 transition-colors">Licensing</a>
+                <a href="#faq" class="text-mstext hover:text-msblue border-b-2 border-transparent hover:border-msblue py-5 transition-colors">FAQ</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openCheckoutModal('Single Commercial License', 29.99)" class="bg-msblue hover:bg-msbluehover text-white text-sm font-semibold px-5 py-2.5 transition-colors border border-msblue flex items-center space-x-2">
+                    <i class="fa-solid fa-shopping-cart text-xs"></i>
+                    <span>Purchase License ($29.99)</span>
+                </button>
             </div>
-        </div>
-        <div class="header-actions">
-            <button class="btn btn-icon" id="themeToggle" title="Toggle Theme">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-            <button class="btn" id="btnLicenseTerms"><i class="fa-solid fa-shield-halved"></i> License Terms</button>
-            <button class="btn btn-primary" id="btnHeaderBuy"><i class="fa-solid fa-cart-shopping"></i> Purchase Commercial License</button>
         </div>
     </header>
 
-    <!-- Microsoft Commercial Product Hero -->
-    <section class="hero">
-        <div class="hero-container">
-            <div>
-                <div class="hero-badge">
-                    <i class="fa-solid fa-certificate"></i> Official Commercial Release v4.2
+    <main class="flex-grow">
+        <section id="overview" class="border-b border-msborder bg-white ms-grid-bg relative py-12 md:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-msblue mb-3">
+                    <span class="bg-msblue/10 border border-msblue/30 px-2 py-0.5 text-msblue">Enterprise Utility Suite</span>
+                    <span class="text-mssubtext">•</span>
+                    <span class="text-mssubtext">Windows 10 / 11 / Server Ready</span>
                 </div>
-                <h2 class="hero-title">Deep Windows De-bloating & Enterprise Package Purge</h2>
-                <p class="hero-desc">
-                    The ultimate administrator toolkit designed to completely remove provisioned AppX applications, standard user packages, locked system directories, and leftover registry keys across Windows 10 and Windows 11 installations.
-                </p>
-                <div class="hero-features-list">
-                    <div class="hero-feature-item">
-                        <i class="fa-solid fa-circle-check"></i> <span>Complete AppX & Provisioned Removal</span>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="border-l-4 border-msblue pl-4">
+                            <h1 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-mstext leading-tight">
+                                Ultimate Windows App Purge Tool
+                            </h1>
+                            <p class="text-lg text-mssubtext mt-2">
+                                Deep-level provisioned AppX package remover, system debloater, and automated deployment cleaner for IT System Administrators.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+                            <div class="border border-msborder p-3 bg-white">
+                                <div class="text-2xl font-semibold text-msblue">100%</div>
+                                <div class="text-xs text-mssubtext uppercase tracking-wider font-semibold">Native C++ Binary</div>
+                            </div>
+                            <div class="border border-msborder p-3 bg-white">
+                                <div class="text-2xl font-semibold text-msblue">&lt; 3.2 MB</div>
+                                <div class="text-xs text-mssubtext uppercase tracking-wider font-semibold">Zero Dependencies</div>
+                            </div>
+                            <div class="border border-msborder p-3 bg-white">
+                                <div class="text-2xl font-semibold text-msblue">0 Bytes</div>
+                                <div class="text-xs text-mssubtext uppercase tracking-wider font-semibold">Telemetry Sent</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-4 pt-4">
+                            <button onclick="openCheckoutModal('Commercial License', 29.99)" class="bg-msblue hover:bg-msbluehover text-white text-base font-semibold px-6 py-3 border border-msblue flex items-center space-x-3 transition-colors">
+                                <span>Buy Commercial License - $29.99</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                            <a href="#script-builder" class="bg-white hover:bg-mslightgray text-mstext font-semibold px-6 py-3 border border-msdarkborder flex items-center space-x-2 transition-colors">
+                                <i class="fa-solid fa-terminal text-msblue"></i>
+                                <span>PowerShell CLI Generator</span>
+                            </a>
+                        </div>
                     </div>
-                    <div class="hero-feature-item">
-                        <i class="fa-solid fa-circle-check"></i> <span>Automated System Restore Points</span>
-                    </div>
-                    <div class="hero-feature-item">
-                        <i class="fa-solid fa-circle-check"></i> <span>Full System Registry Scrubbing</span>
-                    </div>
-                    <div class="hero-feature-item">
-                        <i class="fa-solid fa-circle-check"></i> <span>Administrator Privilege Elevation</span>
+
+                    <div class="lg:col-span-5 border border-msdarkborder bg-white p-4">
+                        <div class="border border-msborder p-4 bg-mslightgray mb-4">
+                            <div class="flex items-center justify-between border-b border-msborder pb-2 mb-3">
+                                <span class="font-semibold text-sm text-mstext">Quick Deployment Specs</span>
+                                <span class="text-xs bg-msblue text-white px-2 py-0.5">Signed Binary</span>
+                            </div>
+                            <ul class="space-y-2 text-xs text-mssubtext">
+                                <li class="flex justify-between border-b border-msborder/50 pb-1"><span>Executable:</span> <span class="font-mono text-mstext">WinPurgeAdmin.exe</span></li>
+                                <li class="flex justify-between border-b border-msborder/50 pb-1"><span>Architecture:</span> <span class="font-mono text-mstext">x64, ARM64, x86</span></li>
+                                <li class="flex justify-between border-b border-msborder/50 pb-1"><span>Target OS:</span> <span class="font-mono text-mstext">Win 11, 10, Server '19/'22</span></li>
+                                <li class="flex justify-between border-b border-msborder/50 pb-1"><span>Execution Mode:</span> <span class="font-mono text-mstext">GUI & Silent CLI</span></li>
+                                <li class="flex justify-between"><span>MD5 Hash:</span> <span class="font-mono text-xs text-mstext">a8f9c122e411b933</span></li>
+                            </ul>
+                        </div>
+                        <a href="#architecture" class="block text-center text-xs font-semibold text-msblue hover:underline py-1">
+                            View Official System Requirements &amp; EULA Audit &rarr;
+                        </a>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Commercial Purchase Card -->
-            <div class="purchase-card">
+        <section class="py-12 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border border-msdarkborder bg-white p-1 mb-2">
+                    <!-- Title Bar -->
+                    <div class="bg-mslightgray border-b border-msborder px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="grid grid-cols-3 gap-0.5 w-4 h-3">
+                                <div class="bg-msblue w-full h-full"></div>
+                                <div class="bg-msblue w-full h-full"></div>
+                                <div class="bg-msblue w-full h-full"></div>
+                                <div class="bg-msblue w-full h-full"></div>
+                                <div class="bg-msblue w-full h-full"></div>
+                                <div class="bg-msblue w-full h-full"></div>
+                            </div>
+                            <span class="text-xs font-semibold text-mstext font-mono">Administrator: Ultimate Windows App Purge Tool v4.8 (x64)</span>
+                        </div>
+                        <div class="flex space-x-1">
+                            <div class="w-3 h-3 border border-msdarkborder bg-white inline-block"></div>
+                            <div class="w-3 h-3 border border-msdarkborder bg-white inline-block"></div>
+                            <div class="w-3 h-3 border border-msblue bg-msblue inline-block"></div>
+                        </div>
+                    </div>
+
+                    <!-- Terminal Visual Viewport -->
+                    <div class="bg-white p-6 font-mono text-xs border border-msborder my-1 space-y-4">
+                        <div class="flex items-center justify-between border-b border-msborder pb-3">
+                            <div class="flex space-x-4">
+                                <button onclick="runSimulatedPurge()" id="run-purge-btn" class="bg-msblue hover:bg-msbluehover text-white px-4 py-1.5 font-sans font-semibold text-xs border border-msblue">
+                                    <i class="fa-solid fa-play mr-1"></i> Execute Enterprise Purge
+                                </button>
+                                <button onclick="resetTerminal()" class="bg-white hover:bg-mslightgray text-mstext border border-msdarkborder px-3 py-1.5 font-sans text-xs">
+                                    Reset Simulation
+                                </button>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="inline-block w-2 h-2 bg-green-600"></span>
+                                <span id="terminal-status" class="text-xs text-mstext font-sans">Ready for Execution</span>
+                            </div>
+                        </div>
+
+                        <!-- Live Console Output Box -->
+                        <div id="terminal-console" class="bg-mslightgray border border-msborder p-4 h-64 overflow-y-auto font-mono text-xs text-mstext space-y-1">
+                            <div class="text-mssubtext">[SYS-INIT] Smart Windows Tools Purge Engine Initialized.</div>
+                            <div class="text-mssubtext">[SYS-INIT] Elevated Token: SeDebugPrivilege ENABLED.</div>
+                            <div class="text-msblue">[INFO] Ready. Click "Execute Enterprise Purge" above to simulate real-time removal.</div>
+                        </div>
+
+                        <!-- Progress Bar Visual -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-mssubtext font-sans">
+                                <span>Removal Execution Progress</span>
+                                <span id="progress-percent">0%</span>
+                            </div>
+                            <div class="w-full bg-mslightgray border border-msborder h-4 p-0.5">
+                                <div id="progress-bar" class="bg-msblue h-full w-0 transition-all duration-200"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-center text-mssubtext mt-2">
+                    * Simulated execution environment. Real execution communicates directly with DISM and PowerShell C++ APIs.
+                </p>
+            </div>
+        </section>
+
+        <section id="features" class="py-16 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-10">
+                    <h2 class="text-2xl font-semibold text-mstext">Enterprise Feature Architecture</h2>
+                    <p class="text-sm text-mssubtext mt-1">Built specifically for Windows Administrators, System Integrators, and Managed Service Providers.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">01</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Deep AppX & Provisioned Purge</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Removes bloatware at system root level, preventing pre-installed package re-installation when new user profiles log in.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">02</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Automated Restore Checkpointing</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Automatically triggers a native System Restore Point and registry backup before executing any purging routine.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">03</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Registry & Orphan File Scrub</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Scans HKLM and HKCU registry hives to erase leftover startup keys, orphan service handles, and temp caches.
+                        </p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">04</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Multi-User & Default Profile Cleaner</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Applies purge policies across all offline user hives, default profile templates, and active user accounts simultaneously.
+                        </p>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">05</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Silent Unattended CLI Support</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Fully automatable via command-line arguments (`/silent`, `/all`, `/export-log`) for integration with SCCM, Intune, and PDQ Deploy.
+                        </p>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">06</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Administrator Elevation Bypass</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Includes TrustedInstaller / SYSTEM token elevation routines to cleanly remove protected system stub packages.
+                        </p>
+                    </div>
+
+                    <!-- Card 7 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">07</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Zero Background Footprint</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Runs as a single executable without background services, auto-updaters, or resident memory hooks.
+                        </p>
+                    </div>
+
+                    <!-- Card 8 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">08</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Group Policy AD Integration</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Export ADMX/ADML policy templates to restrict provisioned bloatware across domain-joined enterprise endpoints.
+                        </p>
+                    </div>
+
+                    <!-- Card 9 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">09</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Audit Logging & CSV Exports</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Generates detailed JSON/CSV logs detailing exact byte amounts freed, registry keys purged, and system status.
+                        </p>
+                    </div>
+
+                    <!-- Card 10 -->
+                    <div class="border border-msborder hover:border-msblue p-6 bg-white transition-colors md:col-span-2 lg:col-span-1">
+                        <div class="w-8 h-8 bg-msblue text-white flex items-center justify-center font-bold mb-4">10</div>
+                        <h3 class="text-base font-semibold text-mstext mb-2">Direct Microsoft API Alignment</h3>
+                        <p class="text-xs text-mssubtext leading-relaxed">
+                            Uses official Windows Management Instrumentation (WMI) and DISM C++ interfaces for maximum system stability.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="py-16 bg-mslightgray border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-10">
+                    <h2 class="text-2xl font-semibold text-mstext">6-Step Execution Architecture</h2>
+                    <p class="text-sm text-mssubtext mt-1">The enterprise-grade sequential workflow executed during every purge operation.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+                    <div class="bg-white border border-msborder p-4">
+                        <div class="text-xs font-semibold text-msblue uppercase mb-1">Step 01</div>
+                        <div class="text-sm font-semibold text-mstext mb-2">System Scan</div>
+                        <div class="text-xs text-mssubtext">Audits provisioned packages across current and future profiles.</div>
+                    </div>
+                    <div class="bg-white border border-msborder p-4">
+                        <div class="text-xs font-semibold text-msblue uppercase mb-1">Step 02</div>
+                        <div class="text-sm font-semibold text-mstext mb-2">Checkpoint</div>
+                        <div class="text-xs text-mssubtext">Generates shadow copy and System Restore point for rollback safety.</div>
+                    </div>
+                    <div class="bg-white border border-msborder p-4">
+                        <div class="text-xs font-semibold text-msblue uppercase mb-1">Step 03</div>
+                        <div class="text-sm font-semibold text-mstext mb-2">Elevate</div>
+                        <div class="text-xs text-mssubtext">Requests SYSTEM level token privileges via WIN32 API.</div>
+                    </div>
+                    <div class="bg-white border border-msborder p-4">
+                        <div class="text-xs font-semibold text-msblue uppercase mb-1">Step 04</div>
+                        <div class="text-sm font-semibold text-mstext mb-2">Package Purge</div>
+                        <div class="text-xs text-mssubtext">Executes DISM package stripping and AppX unstage tasks.</div>
+                    </div>
+                    <div class="bg-white border border-msborder p-4">
+                        <div class="text-xs font-semibold text-msblue uppercase mb-1">Step 05</div>
+                        <div class="text-sm font-semibold text-mstext mb-2">Registry Scrub</div>
+                        <div class="text-xs text-mssubtext">Cleans orphan telemetry keys, leftover services, and start menu items.</div>
+                    </div>
+                    <div class="bg-white border border-msborder p-4">
+                        <div class="text-xs font-semibold text-msblue uppercase mb-1">Step 06</div>
+                        <div class="text-sm font-semibold text-mstext mb-2">Validate</div>
+                        <div class="text-xs text-mssubtext">Verifies integrity of remaining Core Windows OS binaries.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-10">
+                    <h2 class="text-2xl font-semibold text-mstext">Before vs. After Optimization Matrix</h2>
+                    <p class="text-sm text-mssubtext mt-1">Measured metrics on a standard Windows 11 Enterprise installation.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Before -->
+                    <div class="border border-msdarkborder p-6 bg-white">
+                        <div class="flex justify-between items-center border-b border-msborder pb-3 mb-4">
+                            <span class="text-sm font-semibold text-red-700 uppercase tracking-wider">Default OEM Windows 11</span>
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5">Unoptimized</span>
+                        </div>
+                        <ul class="space-y-4 text-xs">
+                            <li class="flex justify-between items-center border-b border-msborder pb-2">
+                                <span class="text-mssubtext">Active Background Processes:</span>
+                                <span class="font-mono font-semibold text-mstext">184 Processes</span>
+                            </li>
+                            <li class="flex justify-between items-center border-b border-msborder pb-2">
+                                <span class="text-mssubtext">Idle RAM Usage (8GB Workstation):</span>
+                                <span class="font-mono font-semibold text-mstext">4.2 GB (52.5%)</span>
+                            </li>
+                            <li class="flex justify-between items-center border-b border-msborder pb-2">
+                                <span class="text-mssubtext">Disk Footprint (Provisioned Apps):</span>
+                                <span class="font-mono font-semibold text-mstext">14.8 GB</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <span class="text-mssubtext">Cold Boot Latency:</span>
+                                <span class="font-mono font-semibold text-mstext">28.4 Seconds</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- After -->
+                    <div class="border-2 border-msblue p-6 bg-white relative">
+                        <div class="absolute -top-3 right-4 bg-msblue text-white text-xs px-2 py-0.5 font-semibold">
+                            Purged System
+                        </div>
+                        <div class="flex justify-between items-center border-b border-msborder pb-3 mb-4">
+                            <span class="text-sm font-semibold text-msblue uppercase tracking-wider">Smart Windows Tools Purged</span>
+                            <span class="text-xs bg-msblue/10 text-msblue px-2 py-0.5 font-semibold">Optimized</span>
+                        </div>
+                        <ul class="space-y-4 text-xs">
+                            <li class="flex justify-between items-center border-b border-msborder pb-2">
+                                <span class="text-mssubtext">Active Background Processes:</span>
+                                <span class="font-mono font-semibold text-msblue">82 Processes (-55%)</span>
+                            </li>
+                            <li class="flex justify-between items-center border-b border-msborder pb-2">
+                                <span class="text-mssubtext">Idle RAM Usage (8GB Workstation):</span>
+                                <span class="font-mono font-semibold text-msblue">1.9 GB (-54%)</span>
+                            </li>
+                            <li class="flex justify-between items-center border-b border-msborder pb-2">
+                                <span class="text-mssubtext">Disk Footprint (Provisioned Apps):</span>
+                                <span class="font-mono font-semibold text-msblue">1.1 GB (-92%)</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <span class="text-mssubtext">Cold Boot Latency:</span>
+                                <span class="font-mono font-semibold text-msblue">11.2 Seconds (-60%)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="calculator" class="py-16 bg-mslightgray border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-8">
+                    <h2 class="text-2xl font-semibold text-mstext">Enterprise ROI &amp; Storage Savings Calculator</h2>
+                    <p class="text-sm text-mssubtext mt-1">Estimate enterprise IT workload reduction and disk reclamation across your fleet.</p>
+                </div>
+
+                <div class="border border-msdarkborder bg-white p-6 sm:p-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <div class="lg:col-span-7 space-y-6">
+                            <div>
+                                <div class="flex justify-between text-sm font-semibold text-mstext mb-2">
+                                    <label for="pc-range">Total Target Workstations:</label>
+                                    <span id="pc-count-label" class="font-mono text-msblue text-base font-bold">250 PCs</span>
+                                </div>
+                                <input type="range" id="pc-range" min="5" max="5000" step="5" value="250" oninput="updateCalculator()" class="w-full h-2 bg-mslightgray border border-msdarkborder accent-msblue cursor-pointer">
+                                <div class="flex justify-between text-xs text-mssubtext mt-1">
+                                    <span>5 PCs</span>
+                                    <span>1,000 PCs</span>
+                                    <span>5,000 PCs</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="border border-msborder p-4 bg-mslightgray">
+                                    <div class="text-xs text-mssubtext font-semibold uppercase">Disk Reclaimed</div>
+                                    <div id="calc-disk" class="text-xl font-bold text-msblue font-mono mt-1">3,425 GB</div>
+                                    <div class="text-xs text-mssubtext mt-0.5">~13.7 GB / PC</div>
+                                </div>
+                                <div class="border border-msborder p-4 bg-mslightgray">
+                                    <div class="text-xs text-mssubtext font-semibold uppercase">Admin Hours Saved</div>
+                                    <div id="calc-hours" class="text-xl font-bold text-msblue font-mono mt-1">187.5 Hours</div>
+                                    <div class="text-xs text-mssubtext mt-0.5">Manual removal time</div>
+                                </div>
+                                <div class="border border-msborder p-4 bg-mslightgray">
+                                    <div class="text-xs text-mssubtext font-semibold uppercase">Est. Labor Savings</div>
+                                    <div id="calc-savings" class="text-xl font-bold text-msblue font-mono mt-1">$12,187</div>
+                                    <div class="text-xs text-mssubtext mt-0.5">Based on $65/hr IT rate</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 border border-msborder p-6 bg-mslightgray space-y-4">
+                            <h3 class="text-sm font-semibold text-mstext border-b border-msborder pb-2">Recommended Deployment License</h3>
+                            <div class="space-y-2">
+                                <div id="recommended-plan-name" class="text-lg font-bold text-msblue">IT Pro / MSP Multi-Pack</div>
+                                <p id="recommended-plan-desc" class="text-xs text-mssubtext">Covers up to 500 managed systems with silent CLI scripting rights.</p>
+                            </div>
+                            <div class="pt-2">
+                                <button onclick="openCheckoutModal('Enterprise Custom Plan', 499)" class="w-full bg-msblue hover:bg-msbluehover text-white text-sm font-semibold py-2.5 border border-msblue">
+                                    Claim License Savings Now &rarr;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="script-builder" class="py-16 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-8">
+                    <h2 class="text-2xl font-semibold text-mstext">PowerShell &amp; CLI Script Builder</h2>
+                    <p class="text-sm text-mssubtext mt-1">Generate customized silent deployment arguments for SCCM, Intune, or Group Policy scripts.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div class="lg:col-span-5 border border-msdarkborder p-6 bg-white space-y-4">
+                        <h3 class="text-sm font-semibold text-mstext border-b border-msborder pb-2">Configure Execution Flags</h3>
+                        
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="flag-silent" checked onchange="buildCliCommand()" class="w-4 h-4 accent-msblue">
+                                <span class="text-xs text-mstext font-semibold">/Silent (Unattended Mode)</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="flag-all" checked onchange="buildCliCommand()" class="w-4 h-4 accent-msblue">
+                                <span class="text-xs text-mstext font-semibold">/PurgeAllProvisioned (Remove all stub apps)</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="flag-telemetry" checked onchange="buildCliCommand()" class="w-4 h-4 accent-msblue">
+                                <span class="text-xs text-mstext font-semibold">/DisableTelemetry (Scrub background key metrics)</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="flag-log" checked onchange="buildCliCommand()" class="w-4 h-4 accent-msblue">
+                                <span class="text-xs text-mstext font-semibold">/ExportCsvLog C:\Logs\PurgeAudit.csv</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="flag-checkpoint" checked onchange="buildCliCommand()" class="w-4 h-4 accent-msblue">
+                                <span class="text-xs text-mstext font-semibold">/CreateRestorePoint "Pre-Purge State"</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 border border-msdarkborder p-6 bg-mslightgray flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center border-b border-msborder pb-2 mb-3">
+                                <span class="text-xs font-semibold text-mstext uppercase">Generated Execution Command</span>
+                                <span class="text-xs text-mssubtext">PowerShell 5.1+ / CMD</span>
+                            </div>
+                            <pre id="cli-output" class="bg-white border border-msborder p-4 font-mono text-xs text-mstext overflow-x-auto whitespace-pre-wrap">WinPurgeAdmin.exe /Silent /PurgeAllProvisioned /DisableTelemetry /ExportCsvLog "C:\Logs\PurgeAudit.csv" /CreateRestorePoint "Pre-Purge State"</pre>
+                        </div>
+
+                        <div class="pt-4 flex items-center space-x-3">
+                            <button onclick="copyCliCommand()" class="bg-msblue hover:bg-msbluehover text-white text-xs font-semibold px-4 py-2 border border-msblue flex items-center space-x-2">
+                                <i class="fa-solid fa-copy"></i>
+                                <span>Copy Command to Clipboard</span>
+                            </button>
+                            <span id="copy-toast" class="text-xs text-green-700 font-semibold hidden">Copied to clipboard!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-8">
+                    <h2 class="text-2xl font-semibold text-mstext">System Benchmark Impact Visualizer</h2>
+                    <p class="text-sm text-mssubtext mt-1">Resource allocation savings measured post-purge.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="border border-msborder p-6 bg-white space-y-3">
+                        <div class="text-xs font-semibold uppercase text-mssubtext">RAM Overhead Reduction</div>
+                        <div class="text-2xl font-bold text-mstext">2.3 GB Saved</div>
+                        <div class="w-full bg-mslightgray border border-msborder h-3">
+                            <div class="bg-msblue h-full w-[54%]"></div>
+                        </div>
+                        <div class="text-xs text-mssubtext">Reduced from 4.2GB to 1.9GB idle memory consumption.</div>
+                    </div>
+
+                    <div class="border border-msborder p-6 bg-white space-y-3">
+                        <div class="text-xs font-semibold uppercase text-mssubtext">Startup Latency</div>
+                        <div class="text-2xl font-bold text-mstext">17.2s Faster</div>
+                        <div class="w-full bg-mslightgray border border-msborder h-3">
+                            <div class="bg-msblue h-full w-[60%]"></div>
+                        </div>
+                        <div class="text-xs text-mssubtext">Boot sequence accelerated by stripping startup app hooks.</div>
+                    </div>
+
+                    <div class="border border-msborder p-6 bg-white space-y-3">
+                        <div class="text-xs font-semibold uppercase text-mssubtext">Active Background Threads</div>
+                        <div class="text-2xl font-bold text-mstext">102 Threads Scrubbed</div>
+                        <div class="w-full bg-mslightgray border border-msborder h-3">
+                            <div class="bg-msblue h-full w-[55%]"></div>
+                        </div>
+                        <div class="text-xs text-mssubtext">Eliminated background network polling and update tasks.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-mslightgray border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-8">
+                    <h2 class="text-2xl font-semibold text-mstext">Enterprise Security &amp; Compliance Standards</h2>
+                    <p class="text-sm text-mssubtext mt-1">Engineered to meet corporate governance and security compliance mandates.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white border border-msborder p-6 text-center space-y-2">
+                        <i class="fa-solid fa-shield-halved text-2xl text-msblue"></i>
+                        <h3 class="text-sm font-semibold text-mstext">ISO 27001 Ready</h3>
+                        <p class="text-xs text-mssubtext">Fully audit-compliant deployment parameters for secure enterprise environments.</p>
+                    </div>
+
+                    <div class="bg-white border border-msborder p-6 text-center space-y-2">
+                        <i class="fa-solid fa-lock text-2xl text-msblue"></i>
+                        <h3 class="text-sm font-semibold text-mstext">Zero Telemetry</h3>
+                        <p class="text-xs text-mssubtext">Does not collect, transmit, or retain any network or user usage data.</p>
+                    </div>
+
+                    <div class="bg-white border border-msborder p-6 text-center space-y-2">
+                        <i class="fa-solid fa-signature text-2xl text-msblue"></i>
+                        <h3 class="text-sm font-semibold text-mstext">Authenticode Signed</h3>
+                        <p class="text-xs text-mssubtext">Digitally signed EV code binary to bypass Microsoft SmartScreen warnings.</p>
+                    </div>
+
+                    <div class="bg-white border border-msborder p-6 text-center space-y-2">
+                        <i class="fa-solid fa-server text-2xl text-msblue"></i>
+                        <h3 class="text-sm font-semibold text-mstext">Offline Capable</h3>
+                        <p class="text-xs text-mssubtext">Functions entirely in air-gapped network environments with zero web calls.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="py-16 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-10">
+                    <h2 class="text-2xl font-semibold text-mstext">Commercial Licensing Models</h2>
+                    <p class="text-sm text-mssubtext mt-1">Perpetual license terms with zero annual recurring subscription fees.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                    <!-- Single PC -->
+                    <div class="border border-msborder p-6 bg-white flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-semibold text-mssubtext uppercase mb-1">Standard Commercial</div>
+                            <h3 class="text-lg font-bold text-mstext">Single Workstation</h3>
+                            <div class="text-3xl font-bold text-msblue my-4">$29.99 <span class="text-xs font-normal text-mssubtext">/ One-time</span></div>
+                            <ul class="space-y-3 text-xs text-mssubtext border-t border-msborder pt-4">
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>1 Standalone PC License</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>Full AppX Purging Engine</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>GUI &amp; Basic CLI Support</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>1 Year Free Version Updates</span></li>
+                            </ul>
+                        </div>
+                        <button onclick="openCheckoutModal('Single Workstation License', 29.99)" class="w-full mt-6 bg-white hover:bg-mslightgray text-mstext border border-msdarkborder font-semibold py-2.5 text-xs">
+                            Select License
+                        </button>
+                    </div>
+
+                    <!-- IT Pro 10-Pack (Featured) -->
+                    <div class="border-2 border-msblue p-6 bg-white flex flex-col justify-between relative">
+                        <div class="absolute -top-3 right-4 bg-msblue text-white text-xs px-2 py-0.5 font-semibold">Recommended</div>
+                        <div>
+                            <div class="text-xs font-semibold text-msblue uppercase mb-1">IT Professional / MSP</div>
+                            <h3 class="text-lg font-bold text-mstext">10-PC Tech License</h3>
+                            <div class="text-3xl font-bold text-msblue my-4">$149.00 <span class="text-xs font-normal text-mssubtext">/ One-time</span></div>
+                            <ul class="space-y-3 text-xs text-mssubtext border-t border-msborder pt-4">
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>10 Workstations or Servers</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>Unattended Silent Deployment</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>PowerShell Script Generator Access</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>Lifetime Version Updates</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>CSV Audit Log Exporting</span></li>
+                            </ul>
+                        </div>
+                        <button onclick="openCheckoutModal('10-PC Tech License', 149.00)" class="w-full mt-6 bg-msblue hover:bg-msbluehover text-white border border-msblue font-semibold py-2.5 text-xs">
+                            Buy Tech License
+                        </button>
+                    </div>
+
+                    <!-- Enterprise Site -->
+                    <div class="border border-msborder p-6 bg-white flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-semibold text-mssubtext uppercase mb-1">Corporate Site</div>
+                            <h3 class="text-lg font-bold text-mstext">Enterprise Unlimited</h3>
+                            <div class="text-3xl font-bold text-msblue my-4">$499.00 <span class="text-xs font-normal text-mssubtext">/ Site License</span></div>
+                            <ul class="space-y-3 text-xs text-mssubtext border-t border-msborder pt-4">
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>Unlimited Corporate Workstations</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>Intune / SCCM MSI Installer Package</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>Active Directory ADMX Policies</span></li>
+                                <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-msblue"></i><span>Priority Engineering Support</span></li>
+                            </ul>
+                        </div>
+                        <button onclick="openCheckoutModal('Enterprise Unlimited Site License', 499.00)" class="w-full mt-6 bg-white hover:bg-mslightgray text-mstext border border-msdarkborder font-semibold py-2.5 text-xs">
+                            Buy Unlimited License
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-mslightgray border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-8">
+                    <h2 class="text-2xl font-semibold text-mstext">OS Compatibility Grid</h2>
+                    <p class="text-sm text-mssubtext mt-1">Verified compatibility across all modern Windows platforms.</p>
+                </div>
+
+                <div class="border border-msdarkborder bg-white overflow-x-auto">
+                    <table class="w-full text-left border-collapse ms-table text-xs">
+                        <thead>
+                            <tr class="bg-mslightgray text-mstext">
+                                <th class="p-3 font-semibold">Operating System Platform</th>
+                                <th class="p-3 font-semibold">Supported Architectures</th>
+                                <th class="p-3 font-semibold">AppX Removal</th>
+                                <th class="p-3 font-semibold">Sysprep Ready</th>
+                                <th class="p-3 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-msborder text-mssubtext">
+                            <tr>
+                                <td class="p-3 font-semibold text-mstext">Windows 11 (21H2, 22H2, 23H2, 24H2)</td>
+                                <td class="p-3 font-mono">x64, ARM64</td>
+                                <td class="p-3 text-green-700 font-semibold">Full Support</td>
+                                <td class="p-3 text-green-700 font-semibold">Yes</td>
+                                <td class="p-3"><span class="bg-green-100 text-green-800 px-2 py-0.5">Verified</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-mstext">Windows 10 Enterprise / LTSC / Pro</td>
+                                <td class="p-3 font-mono">x64, x86</td>
+                                <td class="p-3 text-green-700 font-semibold">Full Support</td>
+                                <td class="p-3 text-green-700 font-semibold">Yes</td>
+                                <td class="p-3"><span class="bg-green-100 text-green-800 px-2 py-0.5">Verified</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-mstext">Windows Server 2022 / 2019 / 2016</td>
+                                <td class="p-3 font-mono">x64</td>
+                                <td class="p-3 text-green-700 font-semibold">Full Support</td>
+                                <td class="p-3 text-green-700 font-semibold">Yes</td>
+                                <td class="p-3"><span class="bg-green-100 text-green-800 px-2 py-0.5">Verified</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-8">
+                    <h2 class="text-2xl font-semibold text-mstext">System Administrator Feedback</h2>
+                    <p class="text-sm text-mssubtext mt-1">Direct quotes from enterprise deployments.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="border border-msborder p-6 bg-white space-y-4">
+                        <p class="text-xs text-mssubtext italic">"We deploy 400+ Windows 11 workstations monthly. The Ultimate Purge tool cut our base image debloating time from 35 minutes down to under 2 minutes per machine."</p>
+                        <div class="border-t border-msborder pt-3">
+                            <div class="text-xs font-semibold text-mstext">David Vance</div>
+                            <div class="text-xs text-mssubtext">Lead Infrastructure Engineer, TechCorp</div>
+                        </div>
+                    </div>
+
+                    <div class="border border-msborder p-6 bg-white space-y-4">
+                        <p class="text-xs text-mssubtext italic">"Crucial for our MSP image prep. Unlike random PowerShell scripts off GitHub, this tool generates audit logs and handles default user hive cleanup properly."</p>
+                        <div class="border-t border-msborder pt-3">
+                            <div class="text-xs font-semibold text-mstext">Marcus Thorne</div>
+                            <div class="text-xs text-mssubtext">VP Managed Services, ApexIT</div>
+                        </div>
+                    </div>
+
+                    <div class="border border-msborder p-6 bg-white space-y-4">
+                        <p class="text-xs text-mssubtext italic">"The automated Restore Point creation and single lightweight executable make it a no-brainer for remote administrative deployments."</p>
+                        <div class="border-t border-msborder pt-3">
+                            <div class="text-xs font-semibold text-mstext">Elena Rostova</div>
+                            <div class="text-xs text-mssubtext">Senior Systems Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="py-16 bg-mslightgray border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border-l-4 border-msblue pl-4 mb-8">
+                    <h2 class="text-2xl font-semibold text-mstext">Frequently Asked Questions</h2>
+                    <p class="text-sm text-mssubtext mt-1">Technical answers for IT deployment teams.</p>
+                </div>
+
+                <div class="space-y-4 max-w-4xl">
+                    <div class="border border-msdarkborder bg-white">
+                        <button onclick="toggleFaq('faq-1')" class="w-full text-left p-4 font-semibold text-sm text-mstext flex justify-between items-center bg-white hover:bg-mslightgray">
+                            <span>Does this break Sysprep when creating generalized OEM images?</span>
+                            <i class="fa-solid fa-plus text-xs text-msblue"></i>
+                        </button>
+                        <div id="faq-1" class="hidden p-4 border-t border-msborder text-xs text-mssubtext leading-relaxed">
+                            No. The tool cleans the provisioned package database (`Get-AppxProvisionedPackage`) correctly, ensuring `Sysprep /generalize` completes without 0x80073cf2 errors.
+                        </div>
+                    </div>
+
+                    <div class="border border-msdarkborder bg-white">
+                        <button onclick="toggleFaq('faq-2')" class="w-full text-left p-4 font-semibold text-sm text-mstext flex justify-between items-center bg-white hover:bg-mslightgray">
+                            <span>Can we roll back changes if a critical component is accidentally purged?</span>
+                            <i class="fa-solid fa-plus text-xs text-msblue"></i>
+                        </button>
+                        <div id="faq-2" class="hidden p-4 border-t border-msborder text-xs text-mssubtext leading-relaxed">
+                            Yes. The tool creates a dedicated System Restore Point and backs up modified registry hives prior to executing any removal routines.
+                        </div>
+                    </div>
+
+                    <div class="border border-msdarkborder bg-white">
+                        <button onclick="toggleFaq('faq-3')" class="w-full text-left p-4 font-semibold text-sm text-mstext flex justify-between items-center bg-white hover:bg-mslightgray">
+                            <span>How is licensing calculated for enterprise environments?</span>
+                            <i class="fa-solid fa-plus text-xs text-msblue"></i>
+                        </button>
+                        <div id="faq-3" class="hidden p-4 border-t border-msborder text-xs text-mssubtext leading-relaxed">
+                            Licensing is perpetual per workstation or server. The Enterprise Site License covers unlimited machines within a single corporate entity.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12 bg-white border-b border-msborder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="border border-msborder bg-mslightgray p-6">
+                    <div class="flex items-start space-x-4">
+                        <i class="fa-solid fa-scale-balanced text-xl text-msblue mt-1"></i>
+                        <div class="space-y-2">
+                            <h3 class="text-sm font-semibold text-mstext">Commercial Software License &amp; Terms Compliance</h3>
+                            <p class="text-xs text-mssubtext leading-relaxed">
+                                Smart Windows Tools is an independent software developer. Windows, DISM, and PowerShell are registered trademarks of Microsoft Corporation. "Ultimate Windows App Purge Tool" utilizes official Windows API hooks and management instrumentation.
+                            </p>
+                            <button onclick="openModal('eula-modal')" class="text-xs font-semibold text-msblue hover:underline">
+                                Read Full Enterprise EULA Agreement &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="checkout-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-2 border-msblue w-full max-w-lg p-6 space-y-6 relative">
+            <div class="flex justify-between items-center border-b border-msborder pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="grid grid-cols-3 gap-0.5 w-5 h-3">
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                    </div>
+                    <span class="text-sm font-bold text-mstext">Smart Windows Tools Checkout</span>
+                </div>
+                <button onclick="closeModal('checkout-modal')" class="text-mstext hover:text-msblue p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="checkout-step-1" class="space-y-4">
+                <div class="bg-mslightgray border border-msborder p-3 flex justify-between items-center">
+                    <div>
+                        <div id="checkout-item-title" class="text-xs font-bold text-mstext">Commercial License</div>
+                        <div class="text-xs text-mssubtext">Instant Digital Delivery + License Key</div>
+                    </div>
+                    <div id="checkout-item-price" class="text-sm font-bold text-msblue">$29.99</div>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-mstext mb-1">Corporate Email Address</label>
+                        <input type="email" id="checkout-email" placeholder="sysadmin@company.com" class="w-full border border-msdarkborder p-2 text-xs text-mstext ms-focus">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-mstext mb-1">Company / Organization Name</label>
+                        <input type="text" placeholder="Enterprise Systems Inc." class="w-full border border-msdarkborder p-2 text-xs text-mstext ms-focus">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-mstext mb-1">Payment Options</label>
+                        <select class="w-full border border-msdarkborder p-2 text-xs text-mstext ms-focus">
+                            <option>Credit Card (Visa / MasterCard / AMEX)</option>
+                            <option>Corporate Purchase Order (PO Invoice)</option>
+                            <option>Wire Transfer / ACH</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="processCheckout()" class="w-full bg-msblue hover:bg-msbluehover text-white text-xs font-bold py-3 border border-msblue uppercase tracking-wider">
+                    Complete Purchase &amp; Generate Key
+                </button>
+            </div>
+
+            <!-- Checkout Step 2: License Key Output -->
+            <div id="checkout-step-2" class="space-y-4 hidden">
+                <div class="bg-green-50 border border-green-300 p-4 text-center space-y-2">
+                    <i class="fa-solid fa-circle-check text-2xl text-green-700"></i>
+                    <h4 class="text-sm font-bold text-green-900">Purchase Completed Successfully!</h4>
+                    <p class="text-xs text-green-800">Your commercial license key has been generated and activated.</p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-mstext">Generated License Key:</label>
+                    <input type="text" readonly value="SWT-4892-9901-COMMERCIAL-PRO" class="w-full border border-msdarkborder bg-mslightgray p-2 text-xs font-mono text-msblue font-bold">
+                </div>
+
+                <div class="flex space-x-3">
+                    <button onclick="downloadBinary()" class="w-full bg-msblue hover:bg-msbluehover text-white text-xs font-semibold py-2.5 border border-msblue flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download WinPurgeAdmin.exe (3.1 MB)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="eula-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-2 border-msblue w-full max-w-2xl p-6 space-y-4 relative">
+            <div class="flex justify-between items-center border-b border-msborder pb-3">
+                <span class="text-sm font-bold text-mstext">End-User License Agreement (EULA)</span>
+                <button onclick="closeModal('eula-modal')" class="text-mstext hover:text-msblue p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="bg-mslightgray border border-msborder p-4 h-64 overflow-y-auto text-xs text-mssubtext space-y-3 font-mono">
+                <p><strong>SMART WINDOWS TOOLS - COMMERCIAL EULA</strong></p>
+                <p>1. GRANT OF LICENSE: Smart Windows Tools grants the licensee a non-exclusive, non-transferable license to execute the Ultimate Windows App Purge Tool according to the tier purchased.</p>
+                <p>2. RESTRICTIONS: Licensee shall not reverse engineer, decompile, or disassemble the signed executable binary files.</p>
+                <p>3. NO WARRANTY: The software is provided "AS IS" without warranty of any kind. Automated backups and system restore points are provided as safeguards.</p>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="closeModal('eula-modal')" class="bg-msblue text-white text-xs font-semibold px-4 py-2 border border-msblue">
+                    Acknowledge &amp; Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-msborder py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-msborder pb-8 gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="grid grid-cols-3 gap-0.5 w-6 h-4">
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                        <div class="bg-msblue w-full h-full"></div>
+                    </div>
+                    <span class="font-semibold text-sm text-mstext">Smart Windows Tools</span>
+                </div>
+
+                <div class="flex flex-wrap gap-6 text-xs text-mssubtext">
+                    <a href="#overview" class="hover:text-msblue">Overview</a>
+                    <a href="#features" class="hover:text-msblue">Features</a>
+                    <a href="#architecture" class="hover:text-msblue">Architecture</a>
+                    <a href="#calculator" class="hover:text-msblue">ROI Calculator</a>
+                    <a href="#pricing" class="hover:text-msblue">Licensing</a>
+                    <a href="#faq" class="hover:text-msblue">FAQ</a>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-center text-xs text-mssubtext gap-4">
                 <div>
-                    <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">COMMERCIAL LICENSE</span>
-                    <div class="price-tag">
-                        <span class="price-amount">$29.99</span>
-                        <span class="price-period">USD / Lifetime License</span>
-                    </div>
+                    &copy; 2026 Smart Windows Tools Inc. All rights reserved. Hard-angled enterprise layout.
                 </div>
-                <p style="font-size: 12px; color: var(--text-secondary);">
-                    Includes standalone executable (`.exe`), source code access, automated license key generation, and lifetime updates.
-                </p>
-                <button class="btn btn-success" id="btnMainBuy" style="justify-content: center;">
-                    <i class="fa-solid fa-bag-shopping"></i> Buy Now & Download App
-                </button>
-                <div class="guarantee-box">
-                    <i class="fa-solid fa-lock" style="font-size: 16px; color: var(--accent-gold);"></i>
-                    <span>Instant Digital Download &bull; 30-Day Money-Back Guarantee</span>
+                <div class="flex space-x-4">
+                    <a href="#" onclick="openModal('eula-modal')" class="hover:underline">Privacy &amp; Cookies</a>
+                    <a href="#" onclick="openModal('eula-modal')" class="hover:underline">Terms of Use</a>
+                    <a href="#" class="hover:underline">Trademarks</a>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Main Workspace / Interactive Demo -->
-    <div class="container">
-        <!-- Interactive Demo Workspace -->
-        <main class="card">
-            <div class="card-header">
-                <span class="card-title">
-                    <i class="fa-solid fa-sliders" style="color: var(--accent-blue)"></i> 
-                    Live App Sandbox (<span id="selectedCount">0</span> Selected Target Apps)
-                </span>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn" id="btnCheckAll">Select All</button>
-                    <button class="btn" id="btnClearAll">Clear All</button>
-                </div>
-            </div>
-
-            <!-- Search Filter -->
-            <div class="toolbar">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Filter supported apps (OneDrive, Edge, Cortana, Xbox, Photos)...">
-                </div>
-            </div>
-
-            <!-- App Selection Grid -->
-            <div class="app-list" id="appList"></div>
-        </main>
-
-        <!-- Sidebar / Commercial License Info & Demo Purge Trigger -->
-        <aside class="sidebar">
-            <div class="license-banner">
-                <h3><i class="fa-solid fa-circle-info"></i> Commercial Software Notice</h3>
-                <p>
-                    You are viewing the interactive online showcase. The full software package provides full privilege elevation, automatic restore checkpoints, and registry scrubbing.
-                </p>
-                <button class="btn btn-primary" id="btnRunPurge" style="width: 100%; justify-content: center; padding: 10px;">
-                    <i class="fa-solid fa-play"></i> Run Sandbox Test Demonstration
-                </button>
-            </div>
-
-            <!-- Software Specifications Card -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title"><i class="fa-solid fa-microchip"></i> Technical Specs</span>
-                </div>
-                <div style="font-size: 12px; display: flex; flex-direction: column; gap: 8px; color: var(--text-secondary);">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Operating System:</span> <strong style="color: var(--text-primary)">Windows 10 / 11 (64-bit)</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Execution Privileges:</span> <strong style="color: var(--text-primary)">Administrator (Run As Admin)</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Architecture:</span> <strong style="color: var(--text-primary)">Python / Windows API / PowerShell</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>License Type:</span> <strong style="color: var(--text-primary)">Commercial / Enterprise</strong>
-                    </div>
-                </div>
-            </div>
-        </aside>
-    </div>
-
-    <!-- Commercial Purchase Modal -->
-    <div class="modal-overlay" id="checkoutModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div>
-                    <h3 style="font-size: 16px; font-weight: 700;">Purchase Commercial License</h3>
-                    <p style="font-size: 12px; color: var(--text-secondary);">Complete checkout to receive your license key & download link instantly.</p>
-                </div>
-                <button class="btn btn-icon" id="btnCloseCheckout"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form id="checkoutForm">
-                <div class="form-group">
-                    <label class="form-label">Full Name / Organization</label>
-                    <input type="text" class="form-control" placeholder="e.g. John Doe / Acme Corp" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Delivery Email Address</label>
-                    <input type="email" class="form-control" placeholder="name@company.com" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Payment Method</label>
-                    <select class="form-control">
-                        <option>Credit / Debit Card (Visa, Mastercard, Amex)</option>
-                        <option>PayPal Commercial Checkout</option>
-                        <option>Wire Transfer / Enterprise Purchase Order</option>
-                    </select>
-                </div>
-
-                <div style="background-color: var(--bg-base); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-                        <span>Total Due Today:</span>
-                        <span style="color: var(--accent-green); font-size: 16px;">$29.99 USD</span>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center;">
-                    <i class="fa-solid fa-lock"></i> Pay $29.99 & Complete Order
-                </button>
-            </form>
-
-            <!-- Fulfillment Screen (Hidden until paid) -->
-            <div id="fulfillmentBox" style="display: none; text-align: center; padding: 20px 0;">
-                <i class="fa-solid fa-circle-check" style="font-size: 48px; color: var(--accent-green); margin-bottom: 12px;"></i>
-                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Payment Successful!</h3>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
-                    Your commercial license key has been generated and registered to your email.
-                </p>
-
-                <div style="background-color: var(--bg-console); border: 1px dashed var(--accent-blue); padding: 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 14px; color: var(--accent-gold); margin-bottom: 20px;" id="licenseKeyDisplay">
-                    LICENSE-KEY-GENERATING...
-                </div>
-
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <a href="#" class="btn btn-success" id="btnDownloadExe" download="UltimateAppPurgeTool.exe">
-                        <i class="fa-solid fa-download"></i> Download Executable (.exe)
-                    </a>
-                    <a href="#" class="btn btn-primary" id="btnDownloadZip" download="UltimateAppPurgeTool_Source.zip">
-                        <i class="fa-solid fa-file-zipper"></i> Download Source (.zip)
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Sandbox Simulator -->
-    <div class="modal-overlay" id="progressModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 style="font-size: 15px; font-weight: 600;" id="modalStatusTitle">Initializing Sandbox Routine...</h3>
-                <span style="font-size: 12px; color: var(--text-secondary);" id="modalCounter">0 / 0 Completed</span>
-            </div>
-            
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="modalProgressFill"></div>
-            </div>
-
-            <div class="console-box" id="modalConsole"></div>
-
-            <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                <button class="btn" id="btnCloseModal" disabled>Close Progress Dialog</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Commercial License Agreement Modal -->
-    <div class="modal-overlay" id="licenseModal">
-        <div class="modal" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3 style="font-size: 16px; font-weight: 700;">End User Commercial License Agreement (EULA)</h3>
-                <button class="btn btn-icon" id="btnCloseLicense"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div style="max-height: 300px; overflow-y: auto; font-size: 12px; color: var(--text-secondary); line-height: 1.6; padding-right: 8px;">
-                <p style="margin-bottom: 10px;"><strong>1. Commercial License Grant:</strong> Smart Windows Tools grants you a non-exclusive, non-transferable lifetime license to install and execute the Ultimate Windows App Purge Tool for administrative de-bloating across organization workstations.</p>
-                <p style="margin-bottom: 10px;"><strong>2. Copyright & Intellectual Property:</strong> All software, branding, code structures, and assets are protected by copyright law. Unauthorized public redistribution or sub-licensing is strictly prohibited.</p>
-                <p style="margin-bottom: 10px;"><strong>3. Warranty Disclaimer:</strong> The software is provided "as is". Always create system restore points (enabled by default) prior to executing batch operations.</p>
-            </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-                <button class="btn btn-primary" id="btnAcceptLicense">Acknowledge & Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div>
-            &copy; 2026 Smart Windows Tools. All Rights Reserved. Windows is a registered trademark of Microsoft Corporation.
-        </div>
-        <div class="footer-links">
-            <a href="https://github.com/smartwindowstools" target="_blank"><i class="fa-brands fa-github"></i> GitHub Repo</a>
-            <a href="#" id="linkTerms">Commercial Terms</a>
-            <a href="#" id="linkSupport">Support & Enquiries</a>
         </div>
     </footer>
 
-    <!-- Notification Toast -->
-    <div class="toast" id="toast">
-        <i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Action completed successfully!</span>
-    </div>
-
-    <!-- ==========================================================================
-       JAVASCRIPT COMMERCIAL ENGINE & SIMULATION
-       ========================================================================== -->
     <script>
-        const MASTER_APPS_LIST = [
-            { Name: "Your Phone / Phone Link", Appx: "Microsoft.YourPhone", Folder: "YourPhone" },
-            { Name: "Cortana", Appx: "Microsoft.54945CDB63C6A", Folder: "Cortana" },
-            { Name: "OneDrive", Appx: "Microsoft.OneDrive", Folder: "OneDrive" },
-            { Name: "Microsoft News", Appx: "Microsoft.BingNews", Folder: "BingNews" },
-            { Name: "Microsoft Edge (Legacy/Dev)", Appx: "Microsoft.MicrosoftEdge", Folder: "MicrosoftEdge" },
-            { Name: "Microsoft Edge DevTools", Appx: "Microsoft.MicrosoftEdgeDevToolsClient", Folder: "MicrosoftEdgeDevToolsClient" },
-            { Name: "Microsoft Edge Stable", Appx: "Microsoft.MicrosoftEdge.Stable", Folder: "Edge" },
-            { Name: "Windows Photos", Appx: "Microsoft.Windows.Photos", Folder: "WindowsPhotos" },
-            { Name: "MS Paint 3D / New Paint", Appx: "Microsoft.MSPaint", Folder: "MSPaint" },
-            { Name: "OneNote for Windows 10", Appx: "Microsoft.Office.OneNote", Folder: "OneNote" },
-            { Name: "Skype", Appx: "Microsoft.SkypeApp", Folder: "SkypeApp" },
-            { Name: "Mail and Calendar", Appx: "Microsoft.windowscommunicationsapps", Folder: "windowscommunicationsapps" },
-            { Name: "Windows Maps", Appx: "Microsoft.WindowsMaps", Folder: "WindowsMaps" },
-            { Name: "Get Help", Appx: "Microsoft.GetHelp", Folder: "GetHelp" },
-            { Name: "Tips / Get Started", Appx: "Microsoft.Getstarted", Folder: "Getstarted" },
-            { Name: "People App", Appx: "Microsoft.People", Folder: "People" },
-            { Name: "People Experience Host", Appx: "Microsoft.Windows.PeopleExperienceHost", Folder: "PeopleExperienceHost" },
-            { Name: "Snipping Tool / Screen Sketch", Appx: "Microsoft.ScreenSketch", Folder: "ScreenSketch" },
-            { Name: "Films & TV / Zune Video", Appx: "Microsoft.ZuneVideo", Folder: "ZuneVideo" },
-            { Name: "Xbox App", Appx: "Microsoft.XboxApp", Folder: "XboxApp" },
-            { Name: "Xbox Game Callable UI", Appx: "Microsoft.XboxGameCallableUI", Folder: "XboxGameCallableUI" },
-            { Name: "Xbox Game Overlay", Appx: "Microsoft.XboxGameOverlay", Folder: "XboxGameOverlay" },
-            { Name: "Xbox Gaming Overlay", Appx: "Microsoft.XboxGamingOverlay", Folder: "XboxGamingOverlay" },
-            { Name: "Xbox Identity Provider", Appx: "Microsoft.XboxIdentityProvider", Folder: "XboxIdentityProvider" },
-            { Name: "Xbox Speech to Text", Appx: "Microsoft.XboxSpeechToTextOverlay", Folder: "XboxSpeechToTextOverlay" }
-        ];
+        // Simulated Purge Execution Terminal Logic
+        let purgeProgress = 0;
+        let purgeInterval = null;
 
-        let selectedIndices = new Set();
+        function runSimulatedPurge() {
+            const consoleBox = document.getElementById('terminal-console');
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            const statusText = document.getElementById('terminal-status');
+            const btn = document.getElementById('run-purge-btn');
 
-        const appListEl = document.getElementById('appList');
-        const searchInput = document.getElementById('searchInput');
-        const selectedCountEl = document.getElementById('selectedCount');
-        const btnCheckAll = document.getElementById('btnCheckAll');
-        const btnClearAll = document.getElementById('btnClearAll');
-        const themeToggle = document.getElementById('themeToggle');
+            if (purgeInterval) clearInterval(purgeInterval);
 
-        const checkoutModal = document.getElementById('checkoutModal');
-        const btnHeaderBuy = document.getElementById('btnHeaderBuy');
-        const btnMainBuy = document.getElementById('btnMainBuy');
-        const btnCloseCheckout = document.getElementById('btnCloseCheckout');
-        const checkoutForm = document.getElementById('checkoutForm');
-        const fulfillmentBox = document.getElementById('fulfillmentBox');
-        const licenseKeyDisplay = document.getElementById('licenseKeyDisplay');
+            purgeProgress = 0;
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            statusText.textContent = "Executing Purge Sequence...";
+            consoleBox.innerHTML = '<div class="text-msblue">[START] Initiating DISM Session &amp; System Restore Checkpoint...</div>';
 
-        const licenseModal = document.getElementById('licenseModal');
-        const btnLicenseTerms = document.getElementById('btnLicenseTerms');
-        const btnCloseLicense = document.getElementById('btnCloseLicense');
-        const btnAcceptLicense = document.getElementById('btnAcceptLicense');
-        const linkTerms = document.getElementById('linkTerms');
-        const linkSupport = document.getElementById('linkSupport');
+            const logs = [
+                "[CHECKPOINT] System Restore Point 'Pre-Purge State' created successfully.",
+                "[SYS-ELEVATE] Granted SeDebugPrivilege and SYSTEM Token privileges.",
+                "[DISM-ENUM] Enumerating provisioned packages across default hive...",
+                "[PURGE] Removing Package: Microsoft.BingNews_8wekyb3d8bbwe... SUCCESS",
+                "[PURGE] Removing Package: Microsoft.GetHelp_8wekyb3d8bbwe... SUCCESS",
+                "[PURGE] Removing Package: Microsoft.Getstarted_8wekyb3d8bbwe... SUCCESS",
+                "[PURGE] Removing Package: Microsoft.MicrosoftSolitaireCollection... SUCCESS",
+                "[PURGE] Removing Package: Microsoft.People_8wekyb3d8bbwe... SUCCESS",
+                "[PURGE] Removing Package: Microsoft.YourPhone_8wekyb3d8bbwe... SUCCESS",
+                "[REG-SCRUB] Deleting orphan startup entries in HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run...",
+                "[CACHE-CLEAN] Purged 1.4 GB temp files from C:\\Windows\\SoftwareDistribution\\Download",
+                "[COMPLETE] Purge Execution Finished cleanly. 0 Errors recorded."
+            ];
 
-        const progressModal = document.getElementById('progressModal');
-        const modalStatusTitle = document.getElementById('modalStatusTitle');
-        const modalCounter = document.getElementById('modalCounter');
-        const modalProgressFill = document.getElementById('modalProgressFill');
-        const modalConsole = document.getElementById('modalConsole');
-        const btnCloseModal = document.getElementById('btnCloseModal');
-        const btnRunPurge = document.getElementById('btnRunPurge');
+            let logIndex = 0;
 
-        function renderAppList(filter = '') {
-            appListEl.innerHTML = '';
-            const query = filter.toLowerCase();
+            purgeInterval = setInterval(() => {
+                purgeProgress += 8.5;
+                if (purgeProgress > 100) purgeProgress = 100;
 
-            MASTER_APPS_LIST.forEach((app, index) => {
-                if (app.Name.toLowerCase().includes(query) || 
-                    app.Appx.toLowerCase().includes(query) || 
-                    app.Folder.toLowerCase().includes(query)) {
+                progressBar.style.width = purgeProgress + "%";
+                progressPercent.textContent = Math.round(purgeProgress) + "%";
 
-                    const isSelected = selectedIndices.has(index);
-                    const item = document.createElement('div');
-                    item.className = `app-item ${isSelected ? 'selected' : ''}`;
-                    item.innerHTML = `
-                        <div class="app-info">
-                            <span class="app-name">${app.Name}</span>
-                            <span class="app-pkg">${app.Appx}</span>
-                        </div>
-                        <div class="checkbox-custom">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-                    `;
-
-                    item.addEventListener('click', () => {
-                        if (selectedIndices.has(index)) {
-                            selectedIndices.delete(index);
-                        } else {
-                            selectedIndices.add(index);
-                        }
-                        renderAppList(searchInput.value);
-                    });
-                    appListEl.appendChild(item);
+                if (logIndex < logs.length) {
+                    const line = document.createElement('div');
+                    line.className = logIndex === logs.length - 1 ? 'text-green-700 font-bold' : 'text-mstext';
+                    line.textContent = logs[logIndex];
+                    consoleBox.appendChild(line);
+                    consoleBox.scrollTop = consoleBox.scrollHeight;
+                    logIndex++;
                 }
-            });
 
-            selectedCountEl.textContent = selectedIndices.size;
+                if (purgeProgress >= 100) {
+                    clearInterval(purgeInterval);
+                    statusText.textContent = "Purge Sequence Completed";
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                }
+            }, 300);
         }
 
-        btnCheckAll.addEventListener('click', () => {
-            MASTER_APPS_LIST.forEach((_, idx) => selectedIndices.add(idx));
-            renderAppList(searchInput.value);
-        });
-
-        btnClearAll.addEventListener('click', () => {
-            selectedIndices.clear();
-            renderAppList(searchInput.value);
-        });
-
-        searchInput.addEventListener('input', (e) => renderAppList(e.target.value));
-
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            themeToggle.querySelector('i').className = newTheme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-        });
-
-        // Checkout Modals
-        function openCheckout() {
-            checkoutModal.classList.add('active');
+        function resetTerminal() {
+            if (purgeInterval) clearInterval(purgeInterval);
+            purgeProgress = 0;
+            document.getElementById('progress-bar').style.width = "0%";
+            document.getElementById('progress-percent').textContent = "0%";
+            document.getElementById('terminal-status').textContent = "Ready for Execution";
+            const consoleBox = document.getElementById('terminal-console');
+            consoleBox.innerHTML = `
+                <div class="text-mssubtext">[SYS-INIT] Smart Windows Tools Purge Engine Initialized.</div>
+                <div class="text-mssubtext">[SYS-INIT] Elevated Token: SeDebugPrivilege ENABLED.</div>
+                <div class="text-msblue">[INFO] Ready. Click "Execute Enterprise Purge" above to simulate real-time removal.</div>
+            `;
+            const btn = document.getElementById('run-purge-btn');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50');
         }
 
-        btnHeaderBuy.addEventListener('click', openCheckout);
-        btnMainBuy.addEventListener('click', openCheckout);
-        btnCloseCheckout.addEventListener('click', () => checkoutModal.classList.remove('active'));
+        // ROI Calculator Logic
+        function updateCalculator() {
+            const pcCount = parseInt(document.getElementById('pc-range').value);
+            document.getElementById('pc-count-label').textContent = pcCount.toLocaleString() + " PCs";
 
-        // License Modal
-        btnLicenseTerms.addEventListener('click', () => licenseModal.classList.add('active'));
-        linkTerms.addEventListener('click', (e) => { e.preventDefault(); licenseModal.classList.add('active'); });
-        btnCloseLicense.addEventListener('click', () => licenseModal.classList.remove('active'));
-        btnAcceptLicense.addEventListener('click', () => licenseModal.classList.remove('active'));
-        linkSupport.addEventListener('click', (e) => { e.preventDefault(); openCheckout(); });
+            const diskSavedGB = Math.round(pcCount * 13.7);
+            const hoursSaved = (pcCount * 0.75).toFixed(1);
+            const laborSavings = Math.round(hoursSaved * 65);
 
-        // Payment Simulation & Delivery
-        checkoutForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            checkoutForm.style.display = 'none';
-            fulfillmentBox.style.display = 'block';
+            document.getElementById('calc-disk').textContent = diskSavedGB.toLocaleString() + " GB";
+            document.getElementById('calc-hours').textContent = hoursSaved.toLocaleString() + " Hours";
+            document.getElementById('calc-savings').textContent = "$" + laborSavings.toLocaleString();
 
-            // Generate License Key
-            const randHex = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-            const licenseKey = `SWT-${randHex()}-${randHex()}-${randHex()}-COMMERCIAL`;
-            licenseKeyDisplay.textContent = licenseKey;
+            const planName = document.getElementById('recommended-plan-name');
+            const planDesc = document.getElementById('recommended-plan-desc');
 
-            // Prepare dynamic software file downloads
-            const dummyExeContent = "MZ... Ultimate Windows App Purge Tool Licensed Executable Binary";
-            const exeBlob = new Blob([dummyExeContent], { type: 'application/octet-stream' });
-            document.getElementById('btnDownloadExe').href = URL.createObjectURL(exeBlob);
+            if (pcCount <= 10) {
+                planName.textContent = "Single / Small Team License";
+                planDesc.textContent = "Ideal for small workstation deployments.";
+            } else if (pcCount <= 500) {
+                planName.textContent = "IT Pro / MSP 10-Pack";
+                planDesc.textContent = "Covers up to 500 managed systems with silent CLI scripting rights.";
+            } else {
+                planName.textContent = "Enterprise Site License ($499)";
+                planDesc.textContent = "Unlimited workstation deployment for entire enterprise domains.";
+            }
+        }
 
-            const dummyZipContent = "PK... Source Code & Execution Scripts Bundle";
-            const zipBlob = new Blob([dummyZipContent], { type: 'application/zip' });
-            document.getElementById('btnDownloadZip').href = URL.createObjectURL(zipBlob);
+        // CLI Builder Logic
+        function buildCliCommand() {
+            let cmd = "WinPurgeAdmin.exe";
+            if (document.getElementById('flag-silent').checked) cmd += " /Silent";
+            if (document.getElementById('flag-all').checked) cmd += " /PurgeAllProvisioned";
+            if (document.getElementById('flag-telemetry').checked) cmd += " /DisableTelemetry";
+            if (document.getElementById('flag-log').checked) cmd += ' /ExportCsvLog "C:\\Logs\\PurgeAudit.csv"';
+            if (document.getElementById('flag-checkpoint').checked) cmd += ' /CreateRestorePoint "Pre-Purge State"';
 
-            showToast("Payment verified! Software download unlocked.");
-        });
+            document.getElementById('cli-output').textContent = cmd;
+        }
 
-        // Sandbox Simulator
-        btnRunPurge.addEventListener('click', () => {
-            if (selectedIndices.size === 0) {
-                alert("Select at least one app in the sandbox list.");
+        function copyCliCommand() {
+            const text = document.getElementById('cli-output').textContent;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('copy-toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2500);
+        }
+
+        // Accordion Toggle
+        function toggleFaq(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Modal Controls
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function openCheckoutModal(title, price) {
+            document.getElementById('checkout-item-title').textContent = title;
+            document.getElementById('checkout-item-price').textContent = "$" + price.toFixed(2);
+            document.getElementById('checkout-step-1').classList.remove('hidden');
+            document.getElementById('checkout-step-2').classList.add('hidden');
+            openModal('checkout-modal');
+        }
+
+        function processCheckout() {
+            const email = document.getElementById('checkout-email').value;
+            if (!email) {
+                alert('Please enter a valid corporate email address.');
                 return;
             }
-
-            modalConsole.innerHTML = '';
-            modalProgressFill.style.width = '0%';
-            btnCloseModal.disabled = true;
-            progressModal.classList.add('active');
-
-            const targets = Array.from(selectedIndices).map(i => MASTER_APPS_LIST[i]);
-            const total = targets.length;
-            let current = 0;
-
-            function appendLog(msg) {
-                const line = document.createElement('div');
-                line.textContent = msg;
-                modalConsole.appendChild(line);
-                modalConsole.scrollTop = modalConsole.scrollHeight;
-            }
-
-            appendLog("[RESTORE] Initializing Windows System Checkpoint...");
-            
-            setTimeout(() => {
-                appendLog("[RESTORE] System Restore Point created.");
-                appendLog("\n================= STARTING SANDBOX PURGE =================");
-
-                function processNext() {
-                    if (current >= total) {
-                        modalStatusTitle.textContent = "================= PURGE COMPLETE =================";
-                        appendLog("\n================= DEMONSTRATION COMPLETE =================");
-                        btnCloseModal.disabled = false;
-                        return;
-                    }
-
-                    const app = targets[current];
-                    current++;
-                    
-                    const percent = Math.round((current / total) * 100);
-                    modalProgressFill.style.width = `${percent}%`;
-                    modalCounter.textContent = `${current} / ${total} Completed`;
-                    modalStatusTitle.textContent = `Processing: ${app.Name}`;
-
-                    appendLog(`\n---> Purging Package: ${app.Name}`);
-                    appendLog(`[APPX] Removed: ${app.Appx}`);
-                    appendLog(`[FILES] Deleted: C:\\Program Files\\WindowsApps\\*${app.Folder}*`);
-                    appendLog(`[REGISTRY] Cleaned keys for ${app.Folder}`);
-
-                    setTimeout(processNext, 400);
-                }
-
-                processNext();
-            }, 800);
-        });
-
-        btnCloseModal.addEventListener('click', () => progressModal.classList.remove('active'));
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
+            document.getElementById('checkout-step-1').classList.add('hidden');
+            document.getElementById('checkout-step-2').classList.remove('hidden');
         }
 
-        renderAppList();
+        function downloadBinary() {
+            alert('Downloading WinPurgeAdmin.exe installer package...');
+        }
     </script>
 </body>
 </html>
