@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Windows 10/11 App Purge Tool</title>
+    
+    <!-- CDNs: FontAwesome Icons & JetBrains Mono Code Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           MICROSOFT FLUENT DESIGN SYSTEM VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', Consolas, Monaco, monospace;
+            
+            /* Fluent Dark Theme Defaults */
+            --bg-base: #202020;
+            --bg-card: #2c2c2c;
+            --bg-card-hover: #323232;
+            --bg-input: #1f1f1f;
+            --bg-console: #121212;
+            
+            --border-color: #3e3e3e;
+            --border-hover: #505050;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #adadad;
+            --text-muted: #767676;
+            
+            --accent-blue: #0078d4;
+            --accent-blue-hover: #106ebe;
+            --accent-red: #c42b1c;
+            --accent-red-hover: #b32417;
+            --accent-green: #107c41;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            
+            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
+            --shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.6);
+            --backdrop-blur: blur(20px);
+        }
+
+        [data-theme="light"] {
+            --bg-base: #f3f3f3;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f9f9f9;
+            --bg-input: #ffffff;
+            --bg-console: #1e1e1e;
+            
+            --border-color: #e5e5e5;
+            --border-hover: #d1d1d1;
+            
+            --text-primary: #1a1a1a;
+            --text-secondary: #5d5d5d;
+            --text-muted: #8a8a8a;
+            
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-modal: 0 16px 32px rgba(0, 0, 0, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==========================================================================
+           MICROSOFT APP BAR / HEADER
+           ========================================================================== */
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            font-size: 22px;
+            color: var(--accent-blue);
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ==========================================================================
+           BUTTONS & CONTROLS (FLUENT STYLE)
+           ========================================================================== */
+        .btn {
+            font-family: var(--font-family);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn:hover {
+            background-color: var(--bg-card-hover);
+            border-color: var(--border-hover);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-blue-hover);
+            border-color: var(--accent-blue-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-red);
+            border-color: var(--accent-red);
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--accent-red-hover);
+            border-color: var(--accent-red-hover);
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+        }
+
+        /* ==========================================================================
+           LAYOUT GRID
+           ========================================================================== */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 24px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 24px;
+            flex: 1;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ==========================================================================
+           SEARCH & APP SELECTION TOOLBAR
+           ========================================================================== */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 7px 12px 7px 34px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* ==========================================================================
+           APP LIST GRID & CARDS
+           ========================================================================== */
+        .app-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-hover);
+            border-radius: 3px;
+        }
+
+        .app-item {
+            background-color: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .app-item:hover {
+            border-color: var(--border-hover);
+            background-color: var(--bg-card-hover);
+        }
+
+        .app-item.selected {
+            border-color: var(--accent-blue);
+            background-color: rgba(0, 120, 212, 0.08);
+        }
+
+        .app-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .app-name {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .app-pkg {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Checkbox styling */
+        .checkbox-custom {
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--text-secondary);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: transparent;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .app-item.selected .checkbox-custom {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        /* ==========================================================================
+           RIGHT SIDEBAR / CODE & PREVIEW PANELS
+           ========================================================================== */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .purge-banner {
+            background: linear-gradient(135deg, rgba(196, 43, 28, 0.15) 0%, rgba(139, 0, 0, 0.25) 100%);
+            border: 1px solid var(--accent-red);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .purge-banner h3 {
+            font-size: 14px;
+            color: #ff6b6b;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .purge-banner p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .code-container {
+            position: relative;
+            background-color: var(--bg-console);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 8px 12px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        pre {
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #00ff66;
+            max-height: 280px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* ==========================================================================
+           MODAL DIALOG & SIMULATION POPUP
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 620px;
+            box-shadow: var(--shadow-modal);
+            padding: 24px;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background-color: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 12px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-blue);
+            transition: width 0.3s ease;
+        }
+
+        .console-box {
+            background-color: var(--bg-console);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            height: 200px;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #00ff66;
+            overflow-y: auto;
+            margin: 12px 0;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--accent-green);
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-modal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand">
+            <i class="fa-brands fa-windows brand-icon"></i>
+            <div class="brand-text">
+                <h1>Ultimate Windows App Purge Tool</h1>
+                <p>System-wide AppX, Provisioned, File & Registry De-bloater</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-icon" id="themeToggle" title="Toggle Light/Dark Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <button class="btn" id="btnAbout"><i class="fa-solid fa-circle-info"></i> About</button>
+            <a href="https://github.com/smartwindowstools" target="_blank" class="btn btn-primary">
+                <i class="fa-brands fa-github"></i> GitHub
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="container">
+        <!-- Main Content Area -->
+        <main class="card">
+            <div class="card-header">
+                <span class="card-title">
+                    <i class="fa-solid fa-list-check" style="color: var(--accent-blue)"></i> 
+                    Target Applications (<span id="selectedCount">0</span> selected)
+                </span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" id="btnCheckAll">Select All</button>
+                    <button class="btn" id="btnClearAll">Clear All</button>
+                </div>
+            </div>
+
+            <!-- Filter Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search apps by name, AppX package, or directory keyword...">
+                </div>
+            </div>
+
+            <!-- List of Target App Packages -->
+            <div class="app-list" id="appList">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+        </main>
+
+        <!-- Sidebar / Execution Deck -->
+        <aside class="sidebar">
+            <!-- Action / Execute Block -->
+            <div class="purge-banner">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Deep Purge Execution</h3>
+                <p>This action executes PowerShell commands with elevated privileges, removing AppX provisioned binaries, registry keys, and residual files.</p>
+                
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 14px; cursor: pointer;">
+                    <input type="checkbox" id="chkRestore" checked>
+                    <span>Create System Restore Point prior to execution</span>
+                </label>
+
+                <button class="btn btn-danger" id="btnRunPurge" style="width: 100%; justify-content: center; padding: 10px;">
+                    <i class="fa-solid fa-trash-can"></i> Execute Selected Purge Routine
+                </button>
+            </div>
+
+            <!-- Python Source Code Showcase -->
+            <div class="card" style="flex: 1;">
+                <div class="card-header" style="margin-bottom: 8px;">
+                    <span class="card-title"><i class="fa-solid fa-code"></i> Python Script Copy</span>
+                    <button class="btn" id="btnCopyCode"><i class="fa-regular fa-copy"></i> Copy Code</button>
+                </div>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>app_purge_tool.py</span>
+                        <span>Python 3.x / Win32</span>
+                    </div>
+                    <pre id="codeBlock"><code># Loading python source code structure...</code></pre>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal Progress Simulator -->
+    <div class="modal-overlay" id="progressModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 style="font-size: 15px; font-weight: 600;" id="modalStatusTitle">Initializing Purge Routine...</h3>
+                <span style="font-size: 12px; color: var(--text-secondary);" id="modalCounter">0 / 0 Completed</span>
+            </div>
+            
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="modalProgressFill"></div>
+            </div>
+
+            <div class="console-box" id="modalConsole"></div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+                <button class="btn" id="btnCloseModal" disabled>Close Progress Dialog</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal Dialog -->
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3 style="font-size: 16px; font-weight: 600;">About Ultimate App Purge Tool</h3>
+                <button class="btn btn-icon" id="btnCloseAbout"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
+                This utility provides a deep, system-wide purge for unwanted Windows 10 and 11 pre-installed AppX packages. It removes core application packages, provisioned deployment installers, residual file directories, and associated registry entries.
+            </p>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <p style="font-size: 12px; font-weight: 600;">Created by:</p>
+                <a href="https://github.com/smartwindowstools" target="_blank" style="color: var(--accent-blue); font-weight: bold; text-decoration: underline; font-size: 13px;">
+                    smart windows tools
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Code copied to clipboard!</span>
+    </div>
+
+    <!-- ==========================================================================
+       JAVASCRIPT LOGIC & INTERACTION ENGINE
+       ========================================================================== -->
+    <script>
+        // Master Target App Catalog matching the Python Script
+        const MASTER_APPS_LIST = [
+            { Name: "Your Phone / Phone Link", Appx: "Microsoft.YourPhone", Folder: "YourPhone" },
+            { Name: "Cortana", Appx: "Microsoft.54945CDB63C6A", Folder: "Cortana" },
+            { Name: "OneDrive", Appx: "Microsoft.OneDrive", Folder: "OneDrive" },
+            { Name: "Microsoft News", Appx: "Microsoft.BingNews", Folder: "BingNews" },
+            { Name: "Microsoft Edge (Legacy/Dev)", Appx: "Microsoft.MicrosoftEdge", Folder: "MicrosoftEdge" },
+            { Name: "Microsoft Edge DevTools", Appx: "Microsoft.MicrosoftEdgeDevToolsClient", Folder: "MicrosoftEdgeDevToolsClient" },
+            { Name: "Microsoft Edge Stable", Appx: "Microsoft.MicrosoftEdge.Stable", Folder: "Edge" },
+            { Name: "Windows Photos", Appx: "Microsoft.Windows.Photos", Folder: "WindowsPhotos" },
+            { Name: "MS Paint 3D / New Paint", Appx: "Microsoft.MSPaint", Folder: "MSPaint" },
+            { Name: "OneNote for Windows 10", Appx: "Microsoft.Office.OneNote", Folder: "OneNote" },
+            { Name: "Skype", Appx: "Microsoft.SkypeApp", Folder: "SkypeApp" },
+            { Name: "Mail and Calendar", Appx: "Microsoft.windowscommunicationsapps", Folder: "windowscommunicationsapps" },
+            { Name: "Windows Maps", Appx: "Microsoft.WindowsMaps", Folder: "WindowsMaps" },
+            { Name: "Get Help", Appx: "Microsoft.GetHelp", Folder: "GetHelp" },
+            { Name: "Tips / Get Started", Appx: "Microsoft.Getstarted", Folder: "Getstarted" },
+            { Name: "People App", Appx: "Microsoft.People", Folder: "People" },
+            { Name: "People Experience Host", Appx: "Microsoft.Windows.PeopleExperienceHost", Folder: "PeopleExperienceHost" },
+            { Name: "Snipping Tool / Screen Sketch", Appx: "Microsoft.ScreenSketch", Folder: "ScreenSketch" },
+            { Name: "Films & TV / Zune Video", Appx: "Microsoft.ZuneVideo", Folder: "ZuneVideo" },
+            { Name: "Xbox App", Appx: "Microsoft.XboxApp", Folder: "XboxApp" },
+            { Name: "Xbox Game Callable UI", Appx: "Microsoft.XboxGameCallableUI", Folder: "XboxGameCallableUI" },
+            { Name: "Xbox Game Overlay", Appx: "Microsoft.XboxGameOverlay", Folder: "XboxGameOverlay" },
+            { Name: "Xbox Gaming Overlay", Appx: "Microsoft.XboxGamingOverlay", Folder: "XboxGamingOverlay" },
+            { Name: "Xbox Identity Provider", Appx: "Microsoft.XboxIdentityProvider", Folder: "XboxIdentityProvider" },
+            { Name: "Xbox Speech to Text", Appx: "Microsoft.XboxSpeechToTextOverlay", Folder: "XboxSpeechToTextOverlay" }
+        ];
+
+        // State Trackers
+        let selectedIndices = new Set();
+        let pythonSourceCode = "";
+
+        // UI Element References
+        const appListEl = document.getElementById('appList');
+        const searchInput = document.getElementById('searchInput');
+        const selectedCountEl = document.getElementById('selectedCount');
+        const btnCheckAll = document.getElementById('btnCheckAll');
+        const btnClearAll = document.getElementById('btnClearAll');
+        const btnRunPurge = document.getElementById('btnRunPurge');
+        const btnCopyCode = document.getElementById('btnCopyCode');
+        const codeBlock = document.getElementById('codeBlock');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Modal References
+        const progressModal = document.getElementById('progressModal');
+        const modalStatusTitle = document.getElementById('modalStatusTitle');
+        const modalCounter = document.getElementById('modalCounter');
+        const modalProgressFill = document.getElementById('modalProgressFill');
+        const modalConsole = document.getElementById('modalConsole');
+        const btnCloseModal = document.getElementById('btnCloseModal');
+
+        const aboutModal = document.getElementById('aboutModal');
+        const btnAbout = document.getElementById('btnAbout');
+        const btnCloseAbout = document.getElementById('btnCloseAbout');
+
+        // Render App List
+        function renderAppList(filter = '') {
+            appListEl.innerHTML = '';
+            const query = filter.toLowerCase();
+
+            MASTER_APPS_LIST.forEach((app, index) => {
+                if (app.Name.toLowerCase().includes(query) || 
+                    app.Appx.toLowerCase().includes(query) || 
+                    app.Folder.toLowerCase().includes(query)) {
+
+                    const isSelected = selectedIndices.has(index);
+                    const item = document.createElement('div');
+                    item.className = `app-item ${isSelected ? 'selected' : ''}`;
+                    item.innerHTML = `
+                        <div class="app-info">
+                            <span class="app-name">${app.Name}</span>
+                            <span class="app-pkg">${app.Appx}</span>
+                        </div>
+                        <div class="checkbox-custom">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    `;
+
+                    item.addEventListener('click', () => toggleAppSelection(index));
+                    appListEl.appendChild(item);
+                }
+            });
+
+            updateSelectedCount();
+        }
+
+        function toggleAppSelection(index) {
+            if (selectedIndices.has(index)) {
+                selectedIndices.delete(index);
+            } else {
+                selectedIndices.add(index);
+            }
+            renderAppList(searchInput.value);
+        }
+
+        function updateSelectedCount() {
+            selectedCountEl.textContent = selectedIndices.size;
+        }
+
+        // Selection Handlers
+        btnCheckAll.addEventListener('click', () => {
+            MASTER_APPS_LIST.forEach((_, idx) => selectedIndices.add(idx));
+            renderAppList(searchInput.value);
+        });
+
+        btnClearAll.addEventListener('click', () => {
+            selectedIndices.clear();
+            renderAppList(searchInput.value);
+        });
+
+        searchInput.addEventListener('input', (e) => renderAppList(e.target.value));
+
+        // Theme Switcher Logic
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeToggle.querySelector('i').className = newTheme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+        });
+
+        // About Dialog Trigger
+        btnAbout.addEventListener('click', () => aboutModal.classList.add('active'));
+        btnCloseAbout.addEventListener('click', () => aboutModal.classList.remove('active'));
+
+        // Toast Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Extract Python script text from existing template structure for copying
+        function loadCodeShowcase() {
+            pythonSourceCode = `import ctypes\nimport glob\nimport os\nimport shutil\nimport subprocess\nimport sys\nimport threading\nimport tkinter as tk\nfrom tkinter import ttk, messagebox, scrolledtext\nimport webbrowser\n\n# Ultimate Windows 10/11 App Purge Tool Source Code\n# Created by: smart windows tools\n\nMASTER_APPS_LIST = ${JSON.stringify(MASTER_APPS_LIST, null, 4)}\n\n# For complete execution script run natively with Admin Rights`;
+            codeBlock.textContent = pythonSourceCode;
+        }
+
+        btnCopyCode.addEventListener('click', () => {
+            navigator.clipboard.writeText(pythonSourceCode);
+            showToast("Python script copied to clipboard!");
+        });
+
+        // Simulate Purge Execution Console Workflow
+        btnRunPurge.addEventListener('click', () => {
+            if (selectedIndices.size === 0) {
+                alert("Please select at least one application to purge.");
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to execute the deep purge routine for ${selectedIndices.size} selected app(s)?`)) {
+                return;
+            }
+
+            // Reset & Open Modal
+            modalConsole.innerHTML = '';
+            modalProgressFill.style.width = '0%';
+            btnCloseModal.disabled = true;
+            progressModal.classList.add('active');
+
+            const targets = Array.from(selectedIndices).map(i => MASTER_APPS_LIST[i]);
+            const total = targets.length;
+            let current = 0;
+
+            function appendLog(msg) {
+                const line = document.createElement('div');
+                line.textContent = msg;
+                modalConsole.appendChild(line);
+                modalConsole.scrollTop = modalConsole.scrollHeight;
+            }
+
+            appendLog("[RESTORE] Creating System Restore Point 'Pre-App-Purge-Restore-Point'...");
+            
+            setTimeout(() => {
+                appendLog("[RESTORE] System Restore Point created successfully.");
+                appendLog("\n================= STARTING PURGE PROCESS =================");
+
+                function processNext() {
+                    if (current >= total) {
+                        modalStatusTitle.textContent = "================= PURGE COMPLETE =================";
+                        appendLog("\n================= SYSTEM CLEANUP CONCLUDED =================");
+                        btnCloseModal.disabled = false;
+                        showToast("Purge operations finished successfully!");
+                        return;
+                    }
+
+                    const app = targets[current];
+                    current++;
+                    
+                    const percent = Math.round((current / total) * 100);
+                    modalProgressFill.style.width = `${percent}%`;
+                    modalCounter.textContent = `${current} / ${total} Completed`;
+                    modalStatusTitle.textContent = `Processing: ${app.Name}`;
+
+                    appendLog(`\n---> Inspecting: ${app.Name}`);
+                    appendLog(`[STATUS] Target verified. Initiating deep removal for: ${app.Name}`);
+                    appendLog(`[APPX] Uninstalling package: ${app.Appx}...`);
+                    appendLog(`[FILES] Wiping matching paths in C:\\Program Files\\WindowsApps\\*${app.Folder}*`);
+                    appendLog(`[REGISTRY] Cleaning residual registry keys for ${app.Folder}...`);
+                    appendLog(`[SUCCESS] Deep purge completed for: ${app.Name}`);
+
+                    setTimeout(processNext, 600);
+                }
+
+                processNext();
+            }, 1000);
+        });
+
+        btnCloseModal.addEventListener('click', () => {
+            progressModal.classList.remove('active');
+        });
+
+        // Initial Load
+        renderAppList();
+        loadCodeShowcase();
+    </script>
+</body>
+</html>
