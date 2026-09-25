@@ -474,11 +474,13 @@ body { background:#FFFFFF; color:#1A1A1A; font-family:'Segoe UI',system-ui,sans-
      ============================================================ -->
 <script>
 // ============================================================
-// API CONFIGURATION — CLOUDFLARE TUNNEL ENDPOINT
+// API CONFIG
 // ============================================================
-// Change this ONE line if your tunnel URL changes.
-// (trycloudflare.com URLs rotate each time you restart cloudflared.)
 const API_BASE = 'https://categories-textbook-excellence-reef.trycloudflare.com';
+const TOKEN_KEY = 'swt_token';
+
+function getToken()  { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch(e){ return ''; } }
+function setToken(t) { try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch(e){} }
 
 // ============================================================
 // MODAL HELPERS
@@ -488,20 +490,37 @@ function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 function toggleFaq(id)  { document.getElementById(id).classList.toggle('hidden'); }
 
 // ============================================================
-// API CLIENT  (now points at the Cloudflare tunnel)
+// API CLIENT — Bearer-token, no cookies
 // ============================================================
 async function api(action, body = null) {
   const url = `${API_BASE}/api.php?action=${encodeURIComponent(action)}`;
-  const opts = {
-    credentials: 'include',                 // send session cookies cross-origin
-    headers: { 'Content-Type': 'application/json' }
-  };
-  if (body !== null) { opts.method = 'POST'; opts.body = JSON.stringify(body); }
-  else               { opts.method = 'GET';  }
-  const res = await fetch(url, opts);
+
+  const headers = { 'Content-Type': 'application/json' };
+  const token = getToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+
+  const opts = { method: body !== null ? 'POST' : 'GET', headers };
+  if (body !== null) opts.body = JSON.stringify(body);
+
+  let res;
+  try {
+    res = await fetch(url, opts);
+  } catch (e) {
+    return { ok: false, error: 'Cannot reach server. Check your internet connection.' };
+  }
+
   let data;
   try { data = await res.json(); }
   catch (e) { data = { ok: false, error: 'Server returned invalid response.' }; }
+
+  // Auto-store any new token the server hands back
+  if (data && data.token) setToken(data.token);
+
+  // Token expired → wipe local token
+  if (res.status === 401 && data && data.error) {
+    if (/auth|session|token/i.test(data.error)) setToken('');
+  }
+
   return data;
 }
 
@@ -511,9 +530,11 @@ async function api(action, body = null) {
 let CURRENT_USER = null;
 
 async function refreshAuth() {
+  if (!getToken()) { CURRENT_USER = null; paintAuth(); return; }
   try {
     const r = await api('me');
     CURRENT_USER = (r && r.ok && r.user) ? r.user : null;
+    if (!CURRENT_USER) setToken('');
   } catch (e) { CURRENT_USER = null; }
   paintAuth();
 }
@@ -591,6 +612,7 @@ async function doLogin() {
 // ============================================================
 async function doLogout(closeAcct = false) {
   await api('logout');
+  setToken('');
   CURRENT_USER = null;
   paintAuth();
   if (closeAcct) closeModal('account-modal');
