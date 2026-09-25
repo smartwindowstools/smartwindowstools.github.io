@@ -469,14 +469,11 @@ body { background:#FFFFFF; color:#1A1A1A; font-family:'Segoe UI',system-ui,sans-
   </div>
 </div>
 
-<!-- ============================================================
-     JS
-     ============================================================ -->
 <script>
 // ============================================================
 // API CONFIG
 // ============================================================
-const API_BASE = 'https://categories-textbook-excellence-reef.trycloudflare.com';
+const API_BASE  = 'https://categories-textbook-excellence-reef.trycloudflare.com';
 const TOKEN_KEY = 'swt_token';
 
 function getToken()  { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch(e){ return ''; } }
@@ -490,11 +487,10 @@ function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 function toggleFaq(id)  { document.getElementById(id).classList.toggle('hidden'); }
 
 // ============================================================
-// API CLIENT — Bearer-token, no cookies
+// API CLIENT — Bearer-token
 // ============================================================
 async function api(action, body = null) {
   const url = `${API_BASE}/api.php?action=${encodeURIComponent(action)}`;
-
   const headers = { 'Content-Type': 'application/json' };
   const token = getToken();
   if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -503,24 +499,18 @@ async function api(action, body = null) {
   if (body !== null) opts.body = JSON.stringify(body);
 
   let res;
-  try {
-    res = await fetch(url, opts);
-  } catch (e) {
-    return { ok: false, error: 'Cannot reach server. Check your internet connection.' };
-  }
+  try { res = await fetch(url, opts); }
+  catch (e) { return { ok: false, error: 'Cannot reach server. Check your internet connection.' }; }
 
   let data;
   try { data = await res.json(); }
   catch (e) { data = { ok: false, error: 'Server returned invalid response.' }; }
 
-  // Auto-store any new token the server hands back
   if (data && data.token) setToken(data.token);
 
-  // Token expired → wipe local token
   if (res.status === 401 && data && data.error) {
     if (/auth|session|token/i.test(data.error)) setToken('');
   }
-
   return data;
 }
 
@@ -548,12 +538,105 @@ function paintAuth() {
     user.classList.add('flex');
     document.getElementById('user-name-btn').textContent =
       CURRENT_USER.name.split(' ')[0] || 'Account';
+    startAutoLogout();
   } else {
     guest.classList.remove('hidden');
     user.classList.add('hidden');
     user.classList.remove('flex');
+    stopAutoLogout();
   }
 }
+
+// ============================================================
+// AUTO-LOGOUT (15 seconds of inactivity)
+// ============================================================
+const AUTO_LOGOUT_SECONDS = 15;
+let autoLogoutTimer     = null;   // setTimeout handle
+let autoLogoutTicker    = null;   // setInterval handle (for countdown UI)
+let autoLogoutRemaining = AUTO_LOGOUT_SECONDS;
+let autoLogoutToastEl   = null;
+
+function _ensureToast() {
+  if (autoLogoutToastEl && document.body.contains(autoLogoutToastEl)) return autoLogoutToastEl;
+  autoLogoutToastEl = document.createElement('div');
+  autoLogoutToastEl.className =
+    'fixed bottom-4 right-4 bg-mstext text-white text-xs font-semibold px-4 py-2 z-[9999] flex items-center space-x-2';
+  autoLogoutToastEl.innerHTML =
+    '<i class="fa-solid fa-clock"></i>' +
+    '<span>Auto logout in <span id="auto-logout-sec">' + AUTO_LOGOUT_SECONDS + '</span>s</span>';
+  document.body.appendChild(autoLogoutToastEl);
+  return autoLogoutToastEl;
+}
+
+function _updateToast() {
+  const el = document.getElementById('auto-logout-sec');
+  if (el) el.textContent = autoLogoutRemaining;
+}
+
+function _hideToast() {
+  if (autoLogoutToastEl && document.body.contains(autoLogoutToastEl)) {
+    autoLogoutToastEl.remove();
+  }
+  autoLogoutToastEl = null;
+}
+
+function startAutoLogout() {
+  // Only when a user is logged in
+  if (!CURRENT_USER) return;
+
+  // Clear any previous timers
+  stopAutoLogout(false);
+
+  autoLogoutRemaining = AUTO_LOGOUT_SECONDS;
+  _ensureToast();
+  _updateToast();
+
+  // Countdown UI (updates every second)
+  autoLogoutTicker = setInterval(() => {
+    autoLogoutRemaining = Math.max(0, autoLogoutRemaining - 1);
+    _updateToast();
+    if (autoLogoutRemaining <= 0) {
+      clearInterval(autoLogoutTicker);
+      autoLogoutTicker = null;
+    }
+  }, 1000);
+
+  // The actual logout
+  autoLogoutTimer = setTimeout(() => {
+    _hideToast();
+    performAutoLogout();
+  }, AUTO_LOGOUT_SECONDS * 1000);
+}
+
+function stopAutoLogout(hideToast = true) {
+  if (autoLogoutTimer)  { clearTimeout(autoLogoutTimer);  autoLogoutTimer  = null; }
+  if (autoLogoutTicker) { clearInterval(autoLogoutTicker); autoLogoutTicker = null; }
+  if (hideToast) _hideToast();
+}
+
+function resetAutoLogout() {
+  if (!CURRENT_USER) return;
+  startAutoLogout();
+}
+
+async function performAutoLogout() {
+  try { await api('logout'); } catch (e) {}
+  setToken('');
+  CURRENT_USER = null;
+  paintAuth();                        // this also calls stopAutoLogout()
+  closeModal('account-modal');
+  flashMsg('Signed out automatically after ' + AUTO_LOGOUT_SECONDS + 's of inactivity.');
+}
+
+// Reset the timer on any user activity while logged in
+(function attachActivityListeners() {
+  const events = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+  events.forEach(evt => {
+    window.addEventListener(evt, () => {
+      if (CURRENT_USER) resetAutoLogout();
+    }, { passive: true });
+  });
+})();
 
 // ============================================================
 // REGISTER
