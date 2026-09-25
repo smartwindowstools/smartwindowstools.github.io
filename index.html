@@ -474,26 +474,34 @@ body { background:#FFFFFF; color:#1A1A1A; font-family:'Segoe UI',system-ui,sans-
      ============================================================ -->
 <script>
 // ============================================================
+// API CONFIGURATION — CLOUDFLARE TUNNEL ENDPOINT
+// ============================================================
+// Change this ONE line if your tunnel URL changes.
+// (trycloudflare.com URLs rotate each time you restart cloudflared.)
+const API_BASE = 'https://categories-textbook-excellence-reef.trycloudflare.com';
+
+// ============================================================
 // MODAL HELPERS
 // ============================================================
 function openModal(id)  { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-function toggleFaq(id) {
-  const el = document.getElementById(id);
-  el.classList.toggle('hidden');
-}
+function toggleFaq(id)  { document.getElementById(id).classList.toggle('hidden'); }
 
 // ============================================================
-// API CLIENT
+// API CLIENT  (now points at the Cloudflare tunnel)
 // ============================================================
 async function api(action, body = null) {
-  const opts = { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } };
+  const url = `${API_BASE}/api.php?action=${encodeURIComponent(action)}`;
+  const opts = {
+    credentials: 'include',                 // send session cookies cross-origin
+    headers: { 'Content-Type': 'application/json' }
+  };
   if (body !== null) { opts.method = 'POST'; opts.body = JSON.stringify(body); }
-  else               { opts.method = 'GET'; }
-  const res = await fetch(`api.php?action=${encodeURIComponent(action)}`, opts);
+  else               { opts.method = 'GET';  }
+  const res = await fetch(url, opts);
   let data;
-  try { data = await res.json(); } catch (e) { data = { ok:false, error:'Server returned invalid response.' }; }
+  try { data = await res.json(); }
+  catch (e) { data = { ok: false, error: 'Server returned invalid response.' }; }
   return data;
 }
 
@@ -517,7 +525,8 @@ function paintAuth() {
     guest.classList.add('hidden');
     user.classList.remove('hidden');
     user.classList.add('flex');
-    document.getElementById('user-name-btn').textContent = CURRENT_USER.name.split(' ')[0] || 'Account';
+    document.getElementById('user-name-btn').textContent =
+      CURRENT_USER.name.split(' ')[0] || 'Account';
   } else {
     guest.classList.remove('hidden');
     user.classList.add('hidden');
@@ -529,11 +538,7 @@ function paintAuth() {
 // REGISTER
 // ============================================================
 function openBuy(plan) {
-  if (CURRENT_USER) {
-    // Already logged in — just open account
-    openAccountModal();
-    return;
-  }
+  if (CURRENT_USER) { openAccountModal(); return; }
   document.getElementById('reg-plan').value = plan;
   document.getElementById('reg-error').classList.add('hidden');
   openModal('register-modal');
@@ -556,7 +561,6 @@ async function doRegister() {
   CURRENT_USER = r.user;
   paintAuth();
   closeModal('register-modal');
-  // Clear fields
   ['reg-name','reg-email','reg-password'].forEach(id => document.getElementById(id).value = '');
   openAccountModal();
 }
@@ -608,8 +612,8 @@ function openAccountModal() {
 }
 
 function toggleBindSave() {
-  const input = document.getElementById('acct-machine');
-  const save  = document.getElementById('acct-bind-save');
+  const input   = document.getElementById('acct-machine');
+  const save    = document.getElementById('acct-bind-save');
   const current = (CURRENT_USER && CURRENT_USER.machine_id) || '';
   if (input.value.trim() !== current) save.classList.remove('hidden');
   else save.classList.add('hidden');
