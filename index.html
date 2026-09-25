@@ -548,29 +548,34 @@ function paintAuth() {
 }
 
 // ============================================================
-// AUTO-LOGOUT (15 seconds of inactivity)
+// AUTO-LOGOUT — SINGLE PERSISTENT INTERVAL
+// Activity only resets a counter. No timer churn. Works every time.
 // ============================================================
 const AUTO_LOGOUT_SECONDS = 15;
-let autoLogoutTimer     = null;   // setTimeout handle
-let autoLogoutTicker    = null;   // setInterval handle (for countdown UI)
+
+let autoLogoutInterval  = null;    // ONE interval, created once per session
 let autoLogoutRemaining = AUTO_LOGOUT_SECONDS;
+let autoLogoutActive    = false;
 let autoLogoutToastEl   = null;
+let autoLogoutSecEl     = null;
 
 function _ensureToast() {
-  if (autoLogoutToastEl && document.body.contains(autoLogoutToastEl)) return autoLogoutToastEl;
+  // Rebuild only if truly missing from the DOM
+  if (autoLogoutToastEl && document.body.contains(autoLogoutToastEl)) return;
+
   autoLogoutToastEl = document.createElement('div');
   autoLogoutToastEl.className =
-    'fixed bottom-4 right-4 bg-mstext text-white text-xs font-semibold px-4 py-2 z-[9999] flex items-center space-x-2';
+    'fixed bottom-4 right-4 bg-mstext text-white text-xs font-semibold px-4 py-2 z-[9999] flex items-center space-x-2 pointer-events-none';
   autoLogoutToastEl.innerHTML =
-    '<i class="fa-solid fa-clock"></i>' +
-    '<span>Auto logout in <span id="auto-logout-sec">' + AUTO_LOGOUT_SECONDS + '</span>s</span>';
+    '<i class="fa-solid fa-clock"></i><span>Auto logout in&nbsp;<b>0</b>s</span>';
+  autoLogoutSecEl = autoLogoutToastEl.querySelector('b');
   document.body.appendChild(autoLogoutToastEl);
-  return autoLogoutToastEl;
 }
 
 function _updateToast() {
-  const el = document.getElementById('auto-logout-sec');
-  if (el) el.textContent = autoLogoutRemaining;
+  if (autoLogoutSecEl && document.body.contains(autoLogoutSecEl)) {
+    autoLogoutSecEl.textContent = String(Math.max(0, autoLogoutRemaining));
+  }
 }
 
 function _hideToast() {
@@ -578,63 +583,74 @@ function _hideToast() {
     autoLogoutToastEl.remove();
   }
   autoLogoutToastEl = null;
+  autoLogoutSecEl   = null;
 }
 
 function startAutoLogout() {
-  // Only when a user is logged in
   if (!CURRENT_USER) return;
 
-  // Clear any previous timers
-  stopAutoLogout(false);
+  // If the interval is already running, just reset the counter.
+  // This is the hot path (fires on every mousemove/keydown/etc.)
+  if (autoLogoutActive) {
+    autoLogoutRemaining = AUTO_LOGOUT_SECONDS;
+    _updateToast();
+    return;
+  }
 
+  // First start of this session
+  autoLogoutActive    = true;
   autoLogoutRemaining = AUTO_LOGOUT_SECONDS;
   _ensureToast();
   _updateToast();
 
-  // Countdown UI (updates every second)
-  autoLogoutTicker = setInterval(() => {
-    autoLogoutRemaining = Math.max(0, autoLogoutRemaining - 1);
-    _updateToast();
-    if (autoLogoutRemaining <= 0) {
-      clearInterval(autoLogoutTicker);
-      autoLogoutTicker = null;
-    }
-  }, 1000);
+  autoLogoutInterval = setInterval(() => {
+    // Safety: stop if user logged out in the meantime
+    if (!CURRENT_USER) { stopAutoLogout(); return; }
 
-  // The actual logout
-  autoLogoutTimer = setTimeout(() => {
-    _hideToast();
-    performAutoLogout();
-  }, AUTO_LOGOUT_SECONDS * 1000);
+    autoLogoutRemaining -= 1;
+
+    if (autoLogoutRemaining <= 0) {
+      autoLogoutRemaining = 0;
+      _updateToast();
+      stopAutoLogout();          // clears interval + hides toast
+      performAutoLogout();       // async — fires the actual logout
+      return;
+    }
+
+    _updateToast();
+  }, 1000);
 }
 
 function stopAutoLogout(hideToast = true) {
-  if (autoLogoutTimer)  { clearTimeout(autoLogoutTimer);  autoLogoutTimer  = null; }
-  if (autoLogoutTicker) { clearInterval(autoLogoutTicker); autoLogoutTicker = null; }
+  if (autoLogoutInterval) {
+    clearInterval(autoLogoutInterval);
+    autoLogoutInterval = null;
+  }
+  autoLogoutActive = false;
   if (hideToast) _hideToast();
-}
-
-function resetAutoLogout() {
-  if (!CURRENT_USER) return;
-  startAutoLogout();
 }
 
 async function performAutoLogout() {
   try { await api('logout'); } catch (e) {}
   setToken('');
   CURRENT_USER = null;
-  paintAuth();                        // this also calls stopAutoLogout()
+  paintAuth();                       // this calls stopAutoLogout() again — idempotent
   closeModal('account-modal');
   flashMsg('Signed out automatically after ' + AUTO_LOGOUT_SECONDS + 's of inactivity.');
 }
 
-// Reset the timer on any user activity while logged in
+// Reset the counter on any user activity while logged in.
+// NOTE: no `passive` on keydown (only on mouse/scroll/touch), to avoid browser quirks.
 (function attachActivityListeners() {
-  const events = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
-  events.forEach(evt => {
+  const mouseEvents = ['mousemove', 'mousedown', 'scroll', 'touchstart', 'click', 'wheel'];
+  mouseEvents.forEach(evt => {
     window.addEventListener(evt, () => {
-      if (CURRENT_USER) resetAutoLogout();
+      if (CURRENT_USER) startAutoLogout();
     }, { passive: true });
+  });
+
+  window.addEventListener('keydown', () => {
+    if (CURRENT_USER) startAutoLogout();
   });
 })();
 
